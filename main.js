@@ -16,9 +16,12 @@ const KERALA = [
   [77.1, 10.38], [76.88, 10.55], [76.82, 10.82], [76.75, 11.05], [76.6, 11.3], [76.42, 11.55], [76.25, 11.75], [76.05, 11.95],
   [75.85, 12.02], [75.6, 12.2], [75.4, 12.42], [75.2, 12.65], [74.98, 12.8],
 ];
-const CITIES = [
-  ['കാസർഗോഡ്', 75.0, 12.5], ['കണ്ണൂർ', 75.37, 11.87], ['വയനാട്', 76.08, 11.68], ['കോഴിക്കോട്', 75.78, 11.26], ['പാലക്കാട്', 76.65, 10.78],
-  ['തൃശൂർ', 76.21, 10.53], ['കൊച്ചി', 76.27, 9.96], ['മൂന്നാർ', 77.06, 10.09], ['ആലപ്പുഴ', 76.34, 9.5], ['കൊല്ലം', 76.6, 8.9], ['തിരുവനന്തപുരം', 76.95, 8.52],
+// all 14 districts (label placed near the district HQ, nudged inland so it sits on land)
+const DISTRICTS = [
+  ['കാസർഗോഡ്', 75.12, 12.45], ['കണ്ണൂർ', 75.5, 11.9], ['വയനാട്', 76.08, 11.65], ['കോഴിക്കോട്', 75.85, 11.3],
+  ['മലപ്പുറം', 76.1, 11.02], ['പാലക്കാട്', 76.62, 10.8], ['തൃശൂർ', 76.3, 10.5], ['എറണാകുളം', 76.4, 10.05],
+  ['ഇടുക്കി', 76.95, 9.85], ['കോട്ടയം', 76.62, 9.6], ['ആലപ്പുഴ', 76.47, 9.3], ['പത്തനംതിട്ട', 76.85, 9.25],
+  ['കൊല്ലം', 76.75, 8.95], ['തിരുവനന്തപുരം', 77.0, 8.55],
 ];
 
 const canvas = document.getElementById('scene');
@@ -30,7 +33,7 @@ scene.background = new THREE.Color('#0B1230');
 scene.fog = new THREE.Fog('#0B1230', 700, 1500);
 const camera = new THREE.PerspectiveCamera(40, 1, 1, 4000);
 const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 40; controls.maxDistance = 900;
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 30; controls.maxDistance = 1100; controls.zoomSpeed = 1.2;
 
 scene.add(new THREE.HemisphereLight('#CFE6FF', '#203018', 1.1));
 const sun = new THREE.DirectionalLight('#FFF1D6', 1.6);
@@ -62,6 +65,8 @@ east.forEach(([lo, la], i) => {
   }
 });
 
+const LABELS = [];
+let HOME_D = 600;
 // text sprites (Malayalam needs the font loaded first)
 function label(text, { size = 34, color = '#FFFFFF', bg = 'rgba(11,18,48,0.75)', scale = 0.16 } = {}) {
   const c = document.createElement('canvas'), x = c.getContext('2d');
@@ -74,6 +79,7 @@ function label(text, { size = 34, color = '#FFFFFF', bg = 'rgba(11,18,48,0.75)',
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
   s.scale.set(w * scale, h * scale, 1); s.renderOrder = 10;
+  s.userData.base = s.scale.clone(); LABELS.push(s);
   return s;
 }
 
@@ -102,7 +108,13 @@ function flyTo(obj) {
 
 async function build() {
   await document.fonts.load('700 30px Manjari');
-  CITIES.forEach(([n, lo, la]) => { const v = P(lo, la); const s = label(n, { size: 30, color: '#E8ECFF', bg: 'rgba(11,18,48,0.55)', scale: 0.2 }); s.position.set(v.x, 10, v.y); scene.add(s); });
+  const pinMat = new THREE.MeshStandardMaterial({ color: '#FFFFFF', emissive: '#FFD23F', emissiveIntensity: 0.4 });
+  DISTRICTS.forEach(([n, lo, la]) => {
+    const v = P(lo, la);
+    const dot = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 1.2, 16), pinMat); dot.position.set(v.x, 5.6, v.y); scene.add(dot);
+    const s = label(n, { size: 36, color: '#FFFFFF', bg: 'rgba(11,18,48,0.7)', scale: 0.22 });
+    s.center.set(0.5, 0); s.position.set(v.x, 7, v.y); scene.add(s);
+  });
 
   const world = await (await fetch('data/world.json', { cache: 'no-store' })).json();
   const list = world.items.slice().sort((a, b) => b.day - a.day || b.id - a.id);
@@ -159,10 +171,21 @@ function resize() {
 }
 addEventListener('resize', resize); resize();
 
-// start: the whole state, tilted, a little closer on tall phone screens
-const portrait = innerHeight > innerWidth;
-camera.position.set(90, portrait ? 760 : 420, portrait ? 470 : 380);
-controls.target.set(15, 0, portrait ? 30 : 0);
+// start: look along Kerala's long NW–SE axis so the state fills a phone screen top to bottom
+const N_END = P(74.9, 12.8), S_END = P(77.15, 8.2);
+const AXIS = new THREE.Vector2().subVectors(S_END, N_END), LEN = AXIS.length(); AXIS.normalize();
+const MID = new THREE.Vector2().addVectors(N_END, S_END).multiplyScalar(0.5);
+function homeView() {
+  const tilt = THREE.MathUtils.degToRad(camera.aspect > 1 ? 52 : 38);             // angle away from straight-down: gives the 3D look
+  const vfov = THREE.MathUtils.degToRad(camera.fov / 2);
+  const D = HOME_D = (LEN * Math.cos(tilt) * 0.5) / Math.tan(vfov) * 1.2;
+  const tgt = new THREE.Vector3(MID.x + AXIS.x * 48, 0, MID.y + AXIS.y * 48);
+  controls.target.copy(tgt);
+  camera.position.set(tgt.x + AXIS.x * Math.sin(tilt) * D, Math.cos(tilt) * D, tgt.z + AXIS.y * Math.sin(tilt) * D);
+  controls.update();
+}
+homeView();
+addEventListener('resize', () => { if (!fly) homeView(); });
 
 const clock = new THREE.Clock();
 function tick() {
@@ -173,6 +196,9 @@ function tick() {
     if (k >= 1) fly = null;
   }
   for (const x of items) { if (x.ring) { const s = 1 + 0.25 * Math.sin(t * 3); x.ring.scale.set(s, s, s); x.ring.material.opacity = 0.5 + 0.3 * Math.sin(t * 3); } }
+  // labels keep a readable on-screen size: shrink as you zoom in instead of filling the screen
+  const _v = new THREE.Vector3();
+  for (const l of LABELS) { const d = camera.position.distanceTo(l.getWorldPosition(_v)); const k = THREE.MathUtils.clamp(d / HOME_D, 0.28, 1.3); l.scale.copy(l.userData.base).multiplyScalar(k); }
   controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
