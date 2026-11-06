@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>നമ്മുടെ കേരളം · കമന്റുകൾ കൊണ്ട് പണിയുന്ന കേരളം</title>
+<meta name="description" content="ഇൻസ്റ്റഗ്രാം കമന്റുകൾ കൊണ്ട് ദിവസവും വളരുന്ന ഒരു 3D കേരളം. @kauthukam__">
+<meta property="og:title" content="നമ്മുടെ കേരളം">
+<meta property="og:description" content="നിങ്ങളുടെ കമന്റ് കൊണ്ട് പണിയുന്ന 3D കേരളം. ഓരോ നിർമ്മിതിക്കും ഒരു കൗതുകം.">
+<meta property="og:image" content="icon-192.png">
+<meta name="theme-color" content="#0B1230">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<header id="hud">
+  <div class="brand">നമ്മുടെ കേരളം</div>
+  <div class="stats"><span id="day">Day 1</span><span class="dot">•</span><span id="count">നിർമ്മിതികൾ 1</span></div>
+</header>
+
+<div id="card" class="hidden" role="dialog" aria-live="polite">
+  <button id="cardClose" aria-label="close">✕</button>
+  <div class="cardDay" id="cardDay"></div>
+  <h2 id="cardName"></h2>
+  <div class="cardPlace" id="cardPlace"></div>
+  <p class="cardFact"><span class="kauthukam">കൗതുകം:</span> <span id="cardFact"></span></p>
+  <div class="cardBy">കമന്റ്: <a id="cardBy" target="_blank" rel="noopener"></a></div>
+</div>
+
+<section id="sheet">
+  <button id="sheetToggle"><span>ഇതുവരെ പണിതത്</span><span id="sheetArrow">▴</span></button>
+  <ol id="list"></ol>
+</section>
+
+<a id="cta" href="https://www.instagram.com/kauthukam__/" target="_blank" rel="noopener">
+  അടുത്തത് എന്ത് പണിയണം? <b>@kauthukam__</b> റീലിൽ കമന്റ് ചെയ്യൂ
+</a>
+
+<div id="loading">കേരളം പണിയുന്നു…</div>
+<script type="module" src="main.js"></script>
+</body>
+</html>
