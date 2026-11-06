@@ -33,7 +33,7 @@ scene.background = new THREE.Color('#0B1230');
 scene.fog = new THREE.Fog('#0B1230', 700, 1500);
 const camera = new THREE.PerspectiveCamera(40, 1, 1, 4000);
 const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 30; controls.maxDistance = 1100; controls.zoomSpeed = 1.2;
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 12; controls.maxDistance = 1100; controls.zoomSpeed = 1.2;
 
 scene.add(new THREE.HemisphereLight('#CFE6FF', '#203018', 1.1));
 const sun = new THREE.DirectionalLight('#FFF1D6', 1.6);
@@ -83,6 +83,29 @@ function label(text, { size = 34, color = '#FFFFFF', bg = 'rgba(11,18,48,0.75)',
   return s;
 }
 
+
+// ---------- room to grow: models are small (≈ a few km), and builds in the same town spread out ----------
+const MODEL_SCALE = 0.7;
+const SPACING = 9;                                    // min distance between two builds (scene units ≈ km)
+const KPOLY = KERALA.map(([lo, la]) => P(lo, la));
+function onLand(v) {                                  // point-in-polygon, with a small margin from the coast
+  let inside = false;
+  for (let i = 0, j = KPOLY.length - 1; i < KPOLY.length; j = i++) {
+    const a = KPOLY[i], b = KPOLY[j];
+    if ((a.y > v.y) !== (b.y > v.y) && v.x < ((b.x - a.x) * (v.y - a.y)) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  return inside;
+}
+const placed = [];
+function freeSpot(v) {                                // golden-angle spiral out from the requested spot until it's free
+  for (let k = 0; k < 400; k++) {
+    const r = k ? 5.5 * Math.sqrt(k) : 0, a = k * 2.39996;
+    const c = new THREE.Vector2(v.x + r * Math.cos(a), v.y + r * Math.sin(a));
+    if ((k === 0 || onLand(c)) && placed.every((p) => p.distanceTo(c) >= SPACING)) { placed.push(c); return c; }
+  }
+  placed.push(v); return v;
+}
+
 // ---------- the world from data/world.json ----------
 const items = [];
 const $ = (id) => document.getElementById(id);
@@ -102,7 +125,7 @@ let fly = null;
 function flyTo(obj) {
   const target = obj.position.clone();
   const from = { p: camera.position.clone(), t: controls.target.clone() };
-  const toT = target.clone().add(new THREE.Vector3(0, 18, -45)), toP = target.clone().add(new THREE.Vector3(70, 110, 150));
+  const toT = target.clone().add(new THREE.Vector3(0, 4, -8)), toP = target.clone().add(new THREE.Vector3(24, 36, 50));
   fly = { from, toT, toP, t0: performance.now(), dur: 1200 };
 }
 
@@ -124,21 +147,22 @@ async function build() {
 
   for (const it of world.items) {
     const g = makeModel(it.model);
-    const v = P(it.lon, it.lat);
+    const v = freeSpot(P(it.lon, it.lat));
     g.position.set(v.x, 5, v.y);
-    g.scale.setScalar(2.2);
+    g.scale.setScalar(MODEL_SCALE);
     g.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.userData.item = it; } });
     g.userData.item = it;
     scene.add(g);
     const tag = label('@' + it.by, { size: 28, color: '#0B1230', bg: '#FFD23F', scale: 0.18 });
-    tag.position.set(v.x, 46, v.y); scene.add(tag);
+    const top = new THREE.Box3().setFromObject(g).max.y;
+    tag.center.set(0.5, 0); tag.userData.tag = true; tag.position.set(v.x, top + 2, v.y); scene.add(tag);
     items.push({ it, g, tag });
   }
   // the newest build gets a pulsing ring
   const newest = items.find((x) => x.it.id === list[0]?.id);
   if (newest) {
-    const ring = new THREE.Mesh(new THREE.RingGeometry(14, 17, 40), new THREE.MeshBasicMaterial({ color: '#FFD23F', transparent: true, opacity: 0.8, side: THREE.DoubleSide }));
-    ring.rotation.x = -Math.PI / 2; ring.position.copy(newest.g.position).setY(5.3); scene.add(ring); newest.ring = ring;
+    const ring = new THREE.Mesh(new THREE.RingGeometry(5, 6.3, 40), new THREE.MeshBasicMaterial({ color: '#FFD23F', transparent: true, opacity: 0.8, side: THREE.DoubleSide }));
+    ring.rotation.x = -Math.PI / 2; ring.position.copy(newest.g.position).setY(5.2); scene.add(ring); newest.ring = ring; newest.tag.userData.keep = true;
   }
 
   $('list').innerHTML = '';
@@ -146,7 +170,7 @@ async function build() {
     const li = document.createElement('li');
     li.innerHTML = `<span class="d">Day ${it.day}</span><span><div class="n"></div><div class="p"></div></span>`;
     li.querySelector('.n').textContent = it.name; li.querySelector('.p').textContent = `${it.place || ''} · @${it.by}`;
-    li.onclick = () => { const x = items.find((y) => y.it === it); flyTo(x.g); showCard(it); };
+    li.onclick = () => { $('sheet').classList.remove('open'); $('sheetArrow').textContent = '▴'; const x = items.find((y) => y.it === it); flyTo(x.g); showCard(it); };
     $('list').appendChild(li);
   }
     $('loading').classList.add('done');
@@ -198,7 +222,7 @@ function tick() {
   for (const x of items) { if (x.ring) { const s = 1 + 0.25 * Math.sin(t * 3); x.ring.scale.set(s, s, s); x.ring.material.opacity = 0.5 + 0.3 * Math.sin(t * 3); } }
   // labels keep a readable on-screen size: shrink as you zoom in instead of filling the screen
   const _v = new THREE.Vector3();
-  for (const l of LABELS) { const d = camera.position.distanceTo(l.getWorldPosition(_v)); const k = THREE.MathUtils.clamp(d / HOME_D, 0.28, 1.3); l.scale.copy(l.userData.base).multiplyScalar(k); }
+  for (const l of LABELS) { const d = camera.position.distanceTo(l.getWorldPosition(_v)); const k = THREE.MathUtils.clamp(d / HOME_D, 0.09, 1.3); l.scale.copy(l.userData.base).multiplyScalar(k); if (l.userData.tag) l.visible = l.userData.keep || d < HOME_D * 0.45; }
   controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
