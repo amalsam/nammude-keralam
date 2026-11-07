@@ -70,5 +70,50 @@ function pin() { // fallback for anything we don't have a model for yet
   return g;
 }
 
-export const MODELS = { coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
+
+function ribbon(curve, w, y, material, n = 240) { // flat strip of width w following a closed curve
+  const pos = [], idx = [];
+  for (let i = 0; i <= n; i++) {
+    const u = i / n, p = curve.getPointAt(u % 1), t = curve.getTangentAt(u % 1);
+    const nx = -t.z, nz = t.x;
+    pos.push(p.x + nx * w / 2, y, p.z + nz * w / 2, p.x - nx * w / 2, y, p.z - nz * w / 2);
+    if (i < n) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+  return new THREE.Mesh(g, material);
+}
+function f1track() { // F1 circuit with a grandstand and a car that laps it
+  const g = new THREE.Group();
+  const P = [[-14, -6], [-4, -8.5], [8, -8], [15, -4], [14, 2], [7, 3], [3, 7.5], [-6, 8], [-13, 5], [-16, 0]].map(([x, z]) => new THREE.Vector3(x, 0, z));
+  const curve = new THREE.CatmullRomCurve3(P, true, 'centripetal');
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(19, 19.5, 0.5, 40), mat('#4FA33A')); base.scale.z = 0.62; base.position.y = 0.25; g.add(base);
+  const curb = [];
+  for (let i = 0; i < 2; i++) curb.push(mat(i ? '#E0453A' : '#FFFFFF', { side: THREE.DoubleSide }));
+  g.add(ribbon(curve, 3.6, 0.55, mat('#FFFFFF', { side: THREE.DoubleSide })));
+  g.add(ribbon(curve, 3.0, 0.6, mat('#2B2F3A', { side: THREE.DoubleSide })));
+  for (let i = 0; i < 6; i++) { // checkered start line
+    const q = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.05, 0.5), curb[i % 2]);
+    const p = curve.getPointAt(0.12), t = curve.getTangentAt(0.12);
+    q.position.set(p.x + (-t.z) * (i - 2.5) * 0.5, 0.65, p.z + t.x * (i - 2.5) * 0.5); g.add(q);
+  }
+  const stand = new THREE.Group();
+  for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(12, 0.9, 1.4), k % 2 ? C.gray : C.white); b.position.set(0, 0.9 + k * 0.9, -k * 1.2); stand.add(b); }
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(12.6, 0.3, 5.6), C.red); roof.position.set(0, 5.4, -1.9); stand.add(roof);
+  for (const x of [-6, 6]) { const c = new THREE.Mesh(new THREE.BoxGeometry(0.3, 5, 0.3), C.gray); c.position.set(x, 2.9, -4.4); stand.add(c); }
+  stand.position.set(-3, 0.5, -12.6); g.add(stand);
+  const car = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.5, 0.9), C.red); body.position.y = 0.45; car.add(body);
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.5, 1.5), mat('#1A1A1A')); wing.position.set(-1.25, 0.8, 0); car.add(wing);
+  const nose = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.15, 1.6), mat('#1A1A1A')); nose.position.set(1.3, 0.3, 0); car.add(nose);
+  for (const [x, z] of [[-0.9, 0.6], [-0.9, -0.6], [0.8, 0.6], [0.8, -0.6]]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.3, 10), mat('#111111')); w.rotation.x = Math.PI / 2; w.position.set(x, 0.32, z); car.add(w); }
+  g.add(car);
+  g.userData.radius = 14;
+  g.userData.update = (time) => {
+    const u = (time * 0.07) % 1, p = curve.getPointAt(u), t = curve.getTangentAt(u);
+    car.position.set(p.x, 0.6, p.z); car.rotation.y = Math.atan2(-t.z, t.x);
+  };
+  return g;
+}
+
+export const MODELS = { f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
 export function makeModel(name) { return (MODELS[name] || pin)(); }

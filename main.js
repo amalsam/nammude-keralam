@@ -97,13 +97,13 @@ function onLand(v) {                                  // point-in-polygon, with 
   return inside;
 }
 const placed = [];
-function freeSpot(v) {                                // golden-angle spiral out from the requested spot until it's free
+function freeSpot(v, r = SPACING / 2) {                                // golden-angle spiral out from the requested spot until it's free
   for (let k = 0; k < 400; k++) {
     const r = k ? 5.5 * Math.sqrt(k) : 0, a = k * 2.39996;
     const c = new THREE.Vector2(v.x + r * Math.cos(a), v.y + r * Math.sin(a));
-    if ((k === 0 || onLand(c)) && placed.every((p) => p.distanceTo(c) >= SPACING)) { placed.push(c); return c; }
+    if ((k === 0 || onLand(c)) && placed.every((p) => p.v.distanceTo(c) >= p.r + r)) { placed.push({ v: c, r }); return c; }
   }
-  placed.push(v); return v;
+  placed.push({ v, r }); return v;
 }
 
 // ---------- the world from data/world.json ----------
@@ -124,8 +124,9 @@ $('sheetToggle').onclick = () => { $('sheet').classList.toggle('open'); $('sheet
 let fly = null;
 function flyTo(obj) {
   const target = obj.position.clone();
+  let o = obj; while (o && !o.userData.R) o = o.parent; const f = Math.max(1, (o?.userData.R || 4.5) / 4.5);
   const from = { p: camera.position.clone(), t: controls.target.clone() };
-  const toT = target.clone().add(new THREE.Vector3(0, 4, -8)), toP = target.clone().add(new THREE.Vector3(24, 36, 50));
+  const toT = target.clone().add(new THREE.Vector3(0, 4, -8 * f)), toP = target.clone().add(new THREE.Vector3(24 * f, 36 * f, 50 * f));
   fly = { from, toT, toP, t0: performance.now(), dur: 1200 };
 }
 
@@ -147,8 +148,9 @@ async function build() {
 
   for (const it of world.items) {
     const g = makeModel(it.model);
-    const v = freeSpot(P(it.lon, it.lat));
-    g.position.set(v.x, 5, v.y);
+    const R = (g.userData.radius || SPACING / 2 / MODEL_SCALE) * MODEL_SCALE;
+    const v = freeSpot(P(it.lon, it.lat), R);
+    g.position.set(v.x, 5, v.y); g.userData.R = R;
     g.scale.setScalar(MODEL_SCALE);
     g.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.userData.item = it; } });
     g.userData.item = it;
@@ -161,7 +163,7 @@ async function build() {
   // the newest build gets a pulsing ring
   const newest = items.find((x) => x.it.id === list[0]?.id);
   if (newest) {
-    const ring = new THREE.Mesh(new THREE.RingGeometry(5, 6.3, 40), new THREE.MeshBasicMaterial({ color: '#FFD23F', transparent: true, opacity: 0.8, side: THREE.DoubleSide }));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(Math.max(5, newest.g.userData.R * 1.1), Math.max(6.3, newest.g.userData.R * 1.1 + 1.3), 48), new THREE.MeshBasicMaterial({ color: '#FFD23F', transparent: true, opacity: 0.8, side: THREE.DoubleSide }));
     ring.rotation.x = -Math.PI / 2; ring.position.copy(newest.g.position).setY(5.2); scene.add(ring); newest.ring = ring; newest.tag.userData.keep = true;
   }
 
@@ -219,7 +221,7 @@ function tick() {
     camera.position.lerpVectors(fly.from.p, fly.toP, e); controls.target.lerpVectors(fly.from.t, fly.toT, e);
     if (k >= 1) fly = null;
   }
-  for (const x of items) { if (x.ring) { const s = 1 + 0.25 * Math.sin(t * 3); x.ring.scale.set(s, s, s); x.ring.material.opacity = 0.5 + 0.3 * Math.sin(t * 3); } }
+  for (const x of items) { x.g.userData.update?.(t); if (x.ring) { const s = 1 + 0.25 * Math.sin(t * 3); x.ring.scale.set(s, s, s); x.ring.material.opacity = 0.5 + 0.3 * Math.sin(t * 3); } }
   // labels keep a readable on-screen size: shrink as you zoom in instead of filling the screen
   const _v = new THREE.Vector3();
   for (const l of LABELS) { const d = camera.position.distanceTo(l.getWorldPosition(_v)); const k = THREE.MathUtils.clamp(d / HOME_D, 0.09, 1.3); l.scale.copy(l.userData.base).multiplyScalar(k); if (l.userData.tag) l.visible = l.userData.keep || d < HOME_D * 0.45; }
