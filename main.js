@@ -114,7 +114,6 @@ function showCard(it) {
   $('cardDay').textContent = `Day ${it.day}`;
   $('cardName').textContent = it.name;
   $('cardPlace').textContent = it.place || '';
-  $('cardFact').textContent = it.fact || '';
   const a = $('cardBy'); a.textContent = '@' + it.by; a.href = `https://www.instagram.com/${it.by}/`;
   $('card').classList.remove('hidden');
 }
