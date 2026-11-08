@@ -55,6 +55,7 @@ land.receiveShadow = true; scene.add(land);
 // Western Ghats: hills just inside the eastern border
 const hillMat = new THREE.MeshStandardMaterial({ color: '#2F7A3C', flatShading: true });
 const east = KERALA.slice(21);
+const HILLS = []; // so builds can clear the ghats around them
 const rand = (i) => { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); };
 east.forEach(([lo, la], i) => {
   for (let j = 0; j < 3; j++) {
@@ -62,6 +63,7 @@ east.forEach(([lo, la], i) => {
     const h = 10 + rand(i * 5 + j) * 18 - j * 4;
     const hill = new THREE.Mesh(new THREE.ConeGeometry(7 + rand(i + j) * 6, h, 6), hillMat);
     hill.position.set(v.x, 4 + h / 2, v.y); hill.castShadow = true; scene.add(hill);
+    HILLS.push({ hill, r: 7 + rand(i + j) * 6 });
   }
 });
 
@@ -150,6 +152,7 @@ async function build() {
     const R = (g.userData.radius || SPACING / 2 / MODEL_SCALE) * MODEL_SCALE;
     const v = freeSpot(P(it.lon, it.lat), R);
     g.position.set(v.x, 5, v.y); g.userData.R = R;
+    for (const { hill, r } of HILLS) if (Math.hypot(hill.position.x - v.x, hill.position.z - v.y) < R + r * 0.9) hill.visible = false; // clear the hills the build sits in
     g.scale.setScalar(MODEL_SCALE);
     g.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.userData.item = it; } });
     g.userData.item = it;
