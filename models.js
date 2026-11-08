@@ -132,8 +132,25 @@ function beach() { // a sandy beach island in its own little sea: waves, palms, 
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 3, 5), C.wood); post.position.y = 1.5; sign.add(post);
   const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.3, 0.2), C.wood); board.position.y = 3.2; sign.add(board);
   sign.position.set(-5, 1.1, 3.5); sign.rotation.y = 0.3; g.add(sign);
-  g.userData.radius = 12;
-  g.userData.update = (time) => foam.forEach((f, i) => { const k = (time * 0.3 + i / 3) % 1, s = 1 + 0.38 * k; f.scale.set(s, s * 0.72, 1); f.material.opacity = 1 - k; });
+  // the joke: Wayanad has no sea, so the sea came up the Thamarassery ghat in tanker lorries
+  const tanker = (x, z, ry) => {
+    const t = new THREE.Group();
+    const cab = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.8), mat('#F2B233')); cab.position.set(2.2, 1.2, 0); t.add(cab);
+    const win = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 1.4), C.glass); win.position.set(3.02, 1.5, 0); t.add(win);
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 3.6, 12), mat('#3FB6E8', { roughness: 0.4 })); tank.rotation.z = Math.PI / 2; tank.position.set(-0.4, 1.4, 0); t.add(tank);
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.98, 0.98, 0.3, 12), C.white); band.rotation.z = Math.PI / 2; band.position.set(-0.4, 1.4, 0); t.add(band);
+    for (const [wx, wz] of [[-1.6, 0.85], [-1.6, -0.85], [2.2, 0.85], [2.2, -0.85]]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.3, 10), mat('#1A1A1A')); w.rotation.x = Math.PI / 2; w.position.set(wx, 0.42, wz); t.add(w); }
+    const hose = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 3, 6), mat('#2B2F3A')); hose.position.set(-2.4, 0.9, 0); hose.rotation.z = 1.1; t.add(hose);
+    t.position.set(x, 0, z); t.rotation.y = ry; t.scale.setScalar(1.1); g.add(t); return t;
+  };
+  const trucks = [tanker(-12.5, 7.5, -0.4), tanker(12.5, 7, Math.PI + 0.4)];
+  const crab = new THREE.Group();
+  const cb = new THREE.Mesh(new THREE.SphereGeometry(0.55, 8, 6), C.red); cb.scale.y = 0.55; crab.add(cb);
+  for (const s of [-1, 1]) { const cl = new THREE.Mesh(new THREE.SphereGeometry(0.25, 6, 5), C.red); cl.position.set(0.5, 0.15, s * 0.45); crab.add(cl); }
+  const bag = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.45, 0.3), mat('#7A4520')); bag.position.set(-0.55, 0.3, 0); crab.add(bag);
+  crab.position.set(1.5, 1.4, 3.8); g.add(crab);
+  g.userData.radius = 13;
+  g.userData.update = (time) => { crab.position.x = 1.5 + Math.sin(time * 0.8) * 2.2; trucks.forEach((tr, i) => { tr.position.y = Math.abs(Math.sin(time * 6 + i)) * 0.06; }); foam.forEach((f, i) => { const k = (time * 0.3 + i / 3) % 1, s = 1 + 0.38 * k; f.scale.set(s, s * 0.72, 1); f.material.opacity = 1 - k; }); };
   return g;
 }
 
