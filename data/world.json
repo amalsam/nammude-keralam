@@ -1,7 +1,7 @@
 {
  "title": "നമ്മുടെ കേരളം",
  "instagram": "kauthukam__",
- "updated": "2026-11-07",
+ "updated": "2026-11-08",
  "items": [
   {
    "id": 1,
@@ -22,6 +22,16 @@
    "lon": 76.5,
    "lat": 10.25,
    "by": "flaviomelton.__"
+  },
+  {
+   "id": 3,
+   "day": 3,
+   "model": "beach",
+   "name": "വയനാട് ബീച്ച്",
+   "place": "വയനാട്",
+   "lon": 76.08,
+   "lat": 11.65,
+   "by": "salmanulfariizi"
   }
  ]
 }

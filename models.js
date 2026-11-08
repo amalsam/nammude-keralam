@@ -115,5 +115,27 @@ function f1track() { // F1 circuit with a grandstand and a car that laps it
   return g;
 }
 
-export const MODELS = { f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
+function beach() { // a sandy beach island in its own little sea: waves, palms, an umbrella and a sign
+  const g = new THREE.Group();
+  const sea = new THREE.Mesh(new THREE.CylinderGeometry(14, 14.5, 0.6, 40), mat('#3FB6E8', { roughness: 0.35 })); sea.scale.z = 0.72; sea.position.y = 0.3; g.add(sea);
+  const sand = new THREE.Mesh(new THREE.CylinderGeometry(8, 9.2, 1.0, 32), mat('#F2D49B')); sand.scale.z = 0.72; sand.position.set(-1, 0.6, 0.8); g.add(sand);
+  const foam = [];
+  for (let i = 0; i < 3; i++) { const f = new THREE.Mesh(new THREE.TorusGeometry(9.6, 0.2, 4, 40), mat('#FFFFFF', { transparent: true })); f.rotation.x = -Math.PI / 2; f.position.set(-1, 0.65, 0.8); g.add(f); foam.push(f); }
+  for (const [x, z, r] of [[3, -2, 0.1], [5, 1.5, -0.15], [-6, -1.5, 0.2]]) { const p = coconut(); p.scale.setScalar(0.5); p.position.set(x, 1.1, z); p.rotation.y = r * 10; g.add(p); }
+  const um = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 4.5, 5), C.white); pole.position.y = 2.25; um.add(pole);
+  const cw = mat('#FFFFFF', { side: THREE.DoubleSide }), cr = mat('#E0453A', { side: THREE.DoubleSide });
+  for (let i = 0; i < 8; i++) { const seg = new THREE.Mesh(new THREE.ConeGeometry(2.6, 1.1, 8, 1, true, (i / 8) * Math.PI * 2, Math.PI / 4), i % 2 ? cr : cw); seg.position.y = 4.6; um.add(seg); }
+  const towel = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.08, 3), mat('#4C7DF0')); towel.position.set(1.4, 0.05, 0.6); um.add(towel);
+  um.position.set(-1.5, 1.1, 2.2); g.add(um);
+  const sign = new THREE.Group();
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 3, 5), C.wood); post.position.y = 1.5; sign.add(post);
+  const board = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.3, 0.2), C.wood); board.position.y = 3.2; sign.add(board);
+  sign.position.set(-5, 1.1, 3.5); sign.rotation.y = 0.3; g.add(sign);
+  g.userData.radius = 12;
+  g.userData.update = (time) => foam.forEach((f, i) => { const k = (time * 0.3 + i / 3) % 1, s = 1 + 0.38 * k; f.scale.set(s, s * 0.72, 1); f.material.opacity = 1 - k; });
+  return g;
+}
+
+export const MODELS = { beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
 export function makeModel(name) { return (MODELS[name] || pin)(); }
