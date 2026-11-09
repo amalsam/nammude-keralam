@@ -32,10 +32,12 @@ function house() {
   return g;
 }
 
-function houseboat() {
+function houseboat() { // kettuvallam: dark wooden hull with raised ends, rounded thatch roof
   const g = new THREE.Group();
-  const hull = new THREE.Mesh(new THREE.BoxGeometry(12, 1.4, 3.6), C.wood); hull.position.y = 0.7; g.add(hull);
-  const roof = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.1, 9, 8, 1, false, 0, Math.PI), C.thatch); roof.rotation.z = Math.PI / 2; roof.rotation.y = Math.PI / 2; roof.rotation.x = Math.PI / 2; roof.position.y = 1.4; g.add(roof);
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(9, 1.2, 3.2), C.wood); hull.position.y = 0.6; g.add(hull);
+  for (const s of [-1, 1]) { const tip = new THREE.Mesh(new THREE.ConeGeometry(1.6, 3, 4), C.wood); tip.rotation.z = -s * Math.PI / 2.6; tip.rotation.y = Math.PI / 4; tip.scale.z = 0.7; tip.position.set(s * 5.2, 1.1, 0); g.add(tip); }
+  const roof = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.7, 7, 10), C.thatch); roof.rotation.z = Math.PI / 2; roof.scale.set(1, 1, 1); roof.position.y = 1.2; g.add(roof);
+  for (const x of [-2.4, 0, 2.4]) { const w = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.8, 3.5), mat('#3A2A1A')); w.position.set(x, 1.9, 0); g.add(w); }
   return g;
 }
 
@@ -178,7 +180,7 @@ function burj() { // Burj Khalifa in Kollam: Y-plan tower with spiralling setbac
   const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 6), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); beacon.position.y = y + 7.1; g.add(beacon);
   const jets = [];
   for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const j = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.18, 1, 5), mat('#FFFFFF', { transparent: true, opacity: 0.8 })); j.position.set(Math.cos(a) * 5.6, 1, Math.sin(a) * 5.6); g.add(j); jets.push(j); }
-  const boat = houseboat(); boat.scale.setScalar(0.5); boat.position.set(9.5, 0.3, 1.5); boat.rotation.y = 0.5; g.add(boat);
+  const boat = houseboat(); boat.scale.setScalar(0.42); boat.position.set(3.6, 0.35, 4.4); boat.rotation.y = 0.5; g.add(boat);
   g.userData.radius = 11;
   g.userData.update = (time) => { beacon.material.emissiveIntensity = 0.3 + 0.7 * (Math.sin(time * 4) > 0 ? 1 : 0); jets.forEach((j, i) => { const h = 1.2 + 1.1 * Math.abs(Math.sin(time * 2.2 + i * 0.8)); j.scale.y = h; j.position.y = 0.5 + h / 2; }); boat.position.y = 0.3 + Math.sin(time * 1.5) * 0.08; };
   return g;
