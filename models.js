@@ -154,5 +154,28 @@ function beach() { // a sandy beach island in its own little sea: waves, palms, 
   return g;
 }
 
-export const MODELS = { beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
+function burj() { // Burj Khalifa in Kollam: stepped glass tower, spire with a blinking light, a fountain pool, a cashew tree and a kettuvallam
+  const g = new THREE.Group();
+  const steel = mat('#C9D6E8', { roughness: 0.3, metalness: 0.2 });
+  const pool = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 7.8, 0.5, 28), mat('#3FB6E8', { roughness: 0.3 })); pool.position.y = 0.25; g.add(pool);
+  const podium = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 4.2, 1.2, 6), C.gray); podium.position.y = 1.1; g.add(podium);
+  const tiers = [[3.0, 2.4, 4.0], [2.5, 2.0, 3.6], [2.1, 1.7, 3.2], [1.7, 1.4, 2.8], [1.35, 1.1, 2.4], [1.0, 0.8, 2.0]];
+  let y = 1.7;
+  tiers.forEach(([rt, rb, h], i) => { const t = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, 6), i % 2 ? steel : C.glass); t.position.y = y + h / 2; t.rotation.y = i * 0.52; g.add(t); y += h; });
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.45, 5.5, 6), C.white); spire.position.y = y + 2.75; g.add(spire);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 6), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); beacon.position.y = y + 5.6; g.add(beacon);
+  const jets = [];
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const j = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.18, 1, 5), mat('#FFFFFF', { transparent: true, opacity: 0.8 })); j.position.set(Math.cos(a) * 5.6, 1, Math.sin(a) * 5.6); g.add(j); jets.push(j); }
+  const cashew = new THREE.Group(); // Kollam = cashew
+  const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.4, 2.2, 6), C.trunk); tr.position.y = 1.1; cashew.add(tr);
+  const cr = new THREE.Mesh(new THREE.IcosahedronGeometry(1.7, 0), mat('#3FA34D')); cr.position.y = 3.1; cr.scale.y = 0.8; cashew.add(cr);
+  for (const [x, z] of [[0.9, 0.5], [-0.8, 0.9], [0.2, -1.1]]) { const f = new THREE.Mesh(new THREE.SphereGeometry(0.32, 6, 5), mat('#F2A33A')); f.position.set(x, 2.5, z); cashew.add(f); }
+  cashew.position.set(-9, 0, 2); g.add(cashew);
+  const boat = houseboat(); boat.scale.setScalar(0.5); boat.position.set(9.5, 0.3, 1.5); boat.rotation.y = 0.5; g.add(boat);
+  g.userData.radius = 11;
+  g.userData.update = (time) => { beacon.material.emissiveIntensity = 0.3 + 0.7 * (Math.sin(time * 4) > 0 ? 1 : 0); jets.forEach((j, i) => { const h = 1.2 + 1.1 * Math.abs(Math.sin(time * 2.2 + i * 0.8)); j.scale.y = h; j.position.y = 0.5 + h / 2; }); boat.position.y = 0.3 + Math.sin(time * 1.5) * 0.08; };
+  return g;
+}
+
+export const MODELS = { burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
 export function makeModel(name) { return (MODELS[name] || pin)(); }
