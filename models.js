@@ -154,16 +154,28 @@ function beach() { // a sandy beach island in its own little sea: waves, palms, 
   return g;
 }
 
-function burj() { // Burj Khalifa in Kollam: stepped glass tower, spire with a blinking light, a fountain pool and a kettuvallam
+function burj() { // Burj Khalifa in Kollam: Y-plan tower with spiralling setbacks, spire with a blinking light, a fountain pool and a kettuvallam
   const g = new THREE.Group();
   const steel = mat('#C9D6E8', { roughness: 0.3, metalness: 0.2 });
   const pool = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 7.8, 0.5, 28), mat('#3FB6E8', { roughness: 0.3 })); pool.position.y = 0.25; g.add(pool);
-  const podium = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 4.2, 1.2, 6), C.gray); podium.position.y = 1.1; g.add(podium);
-  const tiers = [[3.0, 2.4, 4.0], [2.5, 2.0, 3.6], [2.1, 1.7, 3.2], [1.7, 1.4, 2.8], [1.35, 1.1, 2.4], [1.0, 0.8, 2.0]];
-  let y = 1.7;
-  tiers.forEach(([rt, rb, h], i) => { const t = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, 6), i % 2 ? steel : C.glass); t.position.y = y + h / 2; t.rotation.y = i * 0.52; g.add(t); y += h; });
-  const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.45, 5.5, 6), C.white); spire.position.y = y + 2.75; g.add(spire);
-  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 6), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); beacon.position.y = y + 5.6; g.add(beacon);
+  // Real Burj shape: Y-shaped plan (three wings round a hexagonal core); each wing steps back at its own height, so the setbacks spiral up
+  const podium = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.6, 0.8, 6), C.gray); podium.position.y = 0.9; g.add(podium);
+  const glassA = mat('#D7E2EE', { roughness: 0.25, metalness: 0.35 }), glassB = mat('#AFC0D4', { roughness: 0.25, metalness: 0.35 });
+  const N = 14, th = 1.7, base = 1.3, H = N * th;
+  const core = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 1.15, H + 2.5, 6), glassA); core.position.y = base + (H + 2.5) / 2; g.add(core);
+  for (let w = 0; w < 3; w++) {
+    const ang = w * Math.PI * 2 / 3;
+    for (let k = 0; k < N; k++) {
+      const L = 3.4 * (1 - (k + w / 3) / N) ** 1.15; if (L < 0.35) break;
+      const seg = new THREE.Mesh(new THREE.BoxGeometry(1.25 - k * 0.04, th * 0.96, L), k % 2 ? glassB : glassA);
+      seg.position.set(Math.sin(ang) * (L / 2 + 0.5), base + th * (k + 0.5), Math.cos(ang) * (L / 2 + 0.5)); seg.rotation.y = ang; g.add(seg);
+      const nose = new THREE.Mesh(new THREE.CylinderGeometry((1.25 - k * 0.04) / 2, (1.25 - k * 0.04) / 2, th * 0.96, 8), k % 2 ? glassB : glassA); // rounded wing tips
+      nose.position.set(Math.sin(ang) * (L + 0.5), base + th * (k + 0.5), Math.cos(ang) * (L + 0.5)); g.add(nose);
+    }
+  }
+  const y = base + H + 2.5;
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.5, 7, 6), mat('#E8EEF5', { metalness: 0.5, roughness: 0.3 })); spire.position.y = y + 3.5; g.add(spire);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 6), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); beacon.position.y = y + 7.1; g.add(beacon);
   const jets = [];
   for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const j = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.18, 1, 5), mat('#FFFFFF', { transparent: true, opacity: 0.8 })); j.position.set(Math.cos(a) * 5.6, 1, Math.sin(a) * 5.6); g.add(j); jets.push(j); }
   const boat = houseboat(); boat.scale.setScalar(0.5); boat.position.set(9.5, 0.3, 1.5); boat.rotation.y = 0.5; g.add(boat);
