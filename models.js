@@ -478,28 +478,48 @@ function sheru() { // Sheru Bhai for Malappuram: a white lion boss in a white su
   return g;
 }
 
-function twisttower() { // Malappuram Tower (our own design): a glass tower that twists a quarter turn as it climbs, a sky garden half way and a slowly turning halo
+function bitexco() { // Bitexco Financial Tower (Ho Chi Minh City): a lotus-bud glass tower that swells, then tapers to a slanted tip, with a round helipad hanging off its side
   const g = new THREE.Group();
-  const gA = mat('#7FD6C2', { roughness: 0.25, metalness: 0.35 }), gB = mat('#4FB8A4', { roughness: 0.25, metalness: 0.35 });
-  const plaza = new THREE.Mesh(new THREE.CylinderGeometry(6, 6.4, 0.5, 6), mat('#D8D2C0')); plaza.position.y = 0.25; g.add(plaza);
-  const N = 26, th = 0.95;
+  const sm = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.22, metalness: 0.45, ...o });
+  const gA = sm('#A9CDEB', { emissive: '#A9CDEB', emissiveIntensity: 0.22 }), gB = sm('#7FA8CF', { emissive: '#7FA8CF', emissiveIntensity: 0.22 }), steel = mat('#D5DCE6');
+  const plaza = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 6.9, 0.5, 28), mat('#D8D2C0')); plaza.position.y = 0.25; g.add(plaza);
+  const podium = new THREE.Mesh(new THREE.BoxGeometry(7.5, 1.6, 5.6), mat('#B9C2CF')); podium.position.set(0.4, 1.3, 0); g.add(podium);
+  const N = 44, th = 0.6, y0 = 2.1, H = N * th;
+  const R = (u) => (2.15 + 0.75 * Math.sin(Math.min(1, u / 0.42) * Math.PI / 2)) * (u < 0.42 ? 1 : 1 - 0.86 * ((u - 0.42) / 0.58) ** 1.7); // swell, then taper
+  const X = (u) => -0.9 * u * u;                                                                                   // the taper leans to one side
   for (let k = 0; k < N; k++) {
-    if (k === 13) continue; // sky garden gap
-    const w = 4.4 - k * 0.075, f = new THREE.Mesh(new THREE.BoxGeometry(w, th * 0.9, w), k % 2 ? gB : gA);
-    f.position.y = 0.5 + th * (k + 0.5); f.rotation.y = (k / N) * Math.PI / 2; g.add(f);
+    const u0 = k / N, u1 = (k + 1) / N;
+    const f = new THREE.Mesh(new THREE.CylinderGeometry(R(u1), R(u0), th, 28), k % 4 === 3 ? gB : gA);
+    f.scale.z = 0.72; f.position.set((X(u0) + X(u1)) / 2, y0 + th * (k + 0.5), 0); g.add(f);
   }
-  const core = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, N * th, 8), C.white); core.position.y = 0.5 + N * th / 2; g.add(core);
-  const gy = 0.5 + th * 13.5;
-  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + 0.8; const t = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 0), C.frond); t.position.set(Math.cos(a) * 1.5, gy - 0.1, Math.sin(a) * 1.5); g.add(t); }
-  const top = 0.5 + N * th;
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.25, 3.2, 6), C.white); mast.position.y = top + 1.6; g.add(mast);
-  const halo = new THREE.Mesh(new THREE.TorusGeometry(2.3, 0.14, 5, 28), mat('#FFE680', { emissive: '#FFD23F', emissiveIntensity: 0.9 })); halo.position.y = top + 1.5; g.add(halo);
-  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.24, 8, 6), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); tip.position.y = top + 3.3; g.add(tip);
-  for (const [x, z] of [[-4.6, 1.5], [4.2, 2.6]]) { const p = coconut(); p.scale.setScalar(0.38); p.position.set(x, 0.5, z); p.rotation.y = x; g.add(p); }
-  g.userData.radius = 7;
-  g.userData.update = (time) => { halo.rotation.x = Math.PI / 2 + Math.sin(time * 0.9) * 0.35; halo.rotation.y = time * 0.8; tip.material.emissiveIntensity = Math.sin(time * 4) > 0 ? 1 : 0.2; };
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(R(1), 1.6, 20), gB); tip.scale.z = 0.72; tip.position.set(X(1) - 0.12, y0 + H + 0.75, 0); tip.rotation.z = 0.12; g.add(tip);
+  for (const s of [-1, 1]) { // the bright fin running up each narrow edge
+    const pts = []; for (let k = 0; k <= 22; k++) { const u = k / 22; pts.push(new THREE.Vector3(X(u), y0 + u * H, s * R(u) * 0.72)); }
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, 0.09, 5), steel));
+  }
+  const uh = 0.7, hy = y0 + uh * H, hx = X(uh) + R(uh) + 1.5;                                                      // helipad
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 1.9, 0.28, 28), steel); pad.position.set(hx, hy, 0); g.add(pad);
+  const deck = new THREE.Mesh(new THREE.CylinderGeometry(1.85, 1.85, 0.06, 28), mat('#6F7C8C')); deck.position.set(hx, hy + 0.16, 0); g.add(deck);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.07, 4, 28), C.white); ring.rotation.x = Math.PI / 2; ring.position.set(hx, hy + 0.2, 0); g.add(ring);
+  for (const [w, d, z] of [[0.9, 0.14, 0], [0.14, 1.0, 0.38], [0.14, 1.0, -0.38]]) { const h = new THREE.Mesh(new THREE.BoxGeometry(d, 0.05, w), C.white); h.position.set(hx, hy + 0.2, z); g.add(h); }
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.5, 1.5), steel); arm.position.set(hx - 1.7, hy - 0.2, 0); g.add(arm);
+  const lamps = [];
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; const l = new THREE.Mesh(new THREE.SphereGeometry(0.11, 6, 5), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); l.position.set(hx + Math.cos(a) * 1.95, hy + 0.22, Math.sin(a) * 1.95); g.add(l); lamps.push(l); }
+  const heli = new THREE.Group(); // a small helicopter that lifts off and lands
+  const hb = new THREE.Mesh(new THREE.SphereGeometry(0.5, 10, 8), C.red); hb.scale.set(1.5, 0.9, 0.9); heli.add(hb);
+  const ht = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.14, 0.14), C.red); ht.position.set(-1.2, 0.1, 0); heli.add(ht);
+  const rotor = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.04, 0.16), mat('#1A1A1A')); rotor.position.y = 0.55; heli.add(rotor);
+  g.add(heli);
+  for (const [x, z] of [[-5, 2.2], [4.6, 3.4], [-3.8, -3.6]]) { const p = coconut(); p.scale.setScalar(0.36); p.position.set(x, 0.5, z); p.rotation.y = x; g.add(p); }
+  g.userData.radius = 7.5;
+  g.userData.update = (time) => {
+    const c = (time * 0.12) % 1, up = c < 0.15 ? 0 : c < 0.5 ? (c - 0.15) / 0.35 : c < 0.65 ? 1 : 1 - (c - 0.65) / 0.35, e = up * up * (3 - 2 * up);
+    heli.position.set(hx + e * 2.5, hy + 0.6 + e * 5, e * 3); heli.rotation.y = e * 2.4; rotor.rotation.y = time * 25;
+    lamps.forEach((l, i) => { l.material.emissiveIntensity = Math.sin(time * 5 + i) > 0 ? 1 : 0.15; });
+  };
   return g;
 }
 
-export const MODELS = { sheru, twisttower, mountain, taj, eiffel, pyramid, stadium, burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
+
+export const MODELS = { sheru, bitexco, mountain, taj, eiffel, pyramid, stadium, burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
 export function makeModel(name) { return (MODELS[name] || pin)(); }
