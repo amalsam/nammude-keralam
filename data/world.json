@@ -1,7 +1,7 @@
 {
  "title": "നമ്മുടെ കേരളം",
  "instagram": "kauthukam__",
- "updated": "2026-11-09",
+ "updated": "2026-11-16",
  "items": [
   {
    "id": 1,
@@ -42,6 +42,56 @@
    "lon": 76.62,
    "lat": 8.95,
    "by": "mr_afsalappu"
+  },
+  {
+   "id": 5,
+   "day": 5,
+   "model": "stadium",
+   "name": "ഫുട്ബോൾ സ്റ്റേഡിയം",
+   "place": "മലപ്പുറം",
+   "lon": 76.22,
+   "lat": 11.12,
+   "by": "s__falah__"
+  },
+  {
+   "id": 6,
+   "day": 5,
+   "model": "pyramid",
+   "name": "പിരമിഡ്",
+   "place": "കോഴിക്കോട്",
+   "lon": 75.93,
+   "lat": 11.43,
+   "by": "nithin_c_john"
+  },
+  {
+   "id": 7,
+   "day": 5,
+   "model": "eiffel",
+   "name": "പാരീസ് ടവർ",
+   "place": "കൊല്ലം",
+   "lon": 76.92,
+   "lat": 9.03,
+   "by": "__kichuuuuuuu______"
+  },
+  {
+   "id": 8,
+   "day": 5,
+   "model": "taj",
+   "name": "താജ് മഹൽ",
+   "place": "കണ്ണൂർ",
+   "lon": 75.6,
+   "lat": 11.98,
+   "by": "mhd__yaseenn__"
+  },
+  {
+   "id": 9,
+   "day": 5,
+   "model": "mountain",
+   "name": "ആലപ്പുഴ മല",
+   "place": "ആലപ്പുഴ",
+   "lon": 76.56,
+   "lat": 9.4,
+   "by": "venom.4ce"
   }
  ]
 }

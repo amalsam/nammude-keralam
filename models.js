@@ -186,5 +186,189 @@ function burj() { // Burj Khalifa in Kollam: Y-plan tower with spiralling setbac
   return g;
 }
 
-export const MODELS = { burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
+function stadium() { // Malappuram football stadium: striped pitch, a bowl of stands, four floodlights and a ball that never stops
+  const g = new THREE.Group();
+  const SZ = 0.68;
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(13.6, 14, 0.5, 40), mat('#8C93A8')); base.scale.z = SZ; base.position.y = 0.25; g.add(base);
+  for (let i = 0; i < 8; i++) { const st = new THREE.Mesh(new THREE.BoxGeometry(2, 0.12, 9), mat(i % 2 ? '#3FA548' : '#57BD4F')); st.position.set(-7 + i * 2, 0.56, 0); g.add(st); }
+  const line = mat('#FFFFFF');
+  for (const [w, d, x, z] of [[16.2, 0.14, 0, 4.5], [16.2, 0.14, 0, -4.5], [0.14, 9.1, 8, 0], [0.14, 9.1, -8, 0], [0.14, 9.1, 0, 0]]) { const l = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), line); l.position.set(x, 0.64, z); g.add(l); }
+  const circle = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.07, 4, 24), line); circle.rotation.x = Math.PI / 2; circle.position.y = 0.64; g.add(circle);
+  for (const s of [-1, 1]) {
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.06, 4.4), line); box.position.set(s * 6, 0.64, 0); g.add(box);
+    for (const z of [-2.2, 2.2]) { const b = new THREE.Mesh(new THREE.BoxGeometry(2, 0.06, 0.14), line); b.position.set(s * 7, 0.64, z); g.add(b); }
+    for (const z of [-1.1, 1.1]) { const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.1, 5), line); post.position.set(s * 8, 1.15, z); g.add(post); }
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 2.3), line); bar.position.set(s * 8, 1.7, 0); g.add(bar);
+    const net = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.1, 2.2), C.net); net.position.set(s * 8.4, 1.15, 0); g.add(net);
+  }
+  const seat = ['#E0453A', '#FFFFFF', '#F2B233', '#3FA548'];
+  for (let k = 0; k < 4; k++) { // the bowl: stepped elliptical rings, open at one end for the gate
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(10.4 + k * 1.0, 0.62, 4, 44, Math.PI * 1.78), mat(seat[k]));
+    ring.rotation.x = Math.PI / 2; ring.rotation.z = Math.PI * 0.11; ring.scale.set(1, SZ, 1.5); ring.position.y = 1.0 + k * 0.85; g.add(ring);
+  }
+  const lamps = [];
+  for (const [x, z] of [[10.5, 6.4], [10.5, -6.4], [-10.5, 6.4], [-10.5, -6.4]]) {
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 9, 5), C.gray); pole.position.set(x, 4.5, z); g.add(pole);
+    const lamp = new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.2, 0.35), mat('#FFF6C8', { emissive: '#FFE680', emissiveIntensity: 0.9 }));
+    lamp.position.set(x, 9.3, z); lamp.rotation.y = Math.atan2(x, z); lamp.rotation.x = 0.35; g.add(lamp); lamps.push(lamp);
+  }
+  const ball = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 0), mat('#FFFFFF')); g.add(ball);
+  const flag = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.9, 0.06), mat('#3FA548')); flag.position.set(13.3, 4.4, 0); g.add(flag);
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 5, 5), C.white); mast.position.set(12.5, 2.5, 0); g.add(mast);
+  g.userData.radius = 14;
+  g.userData.update = (time) => {
+    const u = time * 0.9; ball.position.set(Math.sin(u) * 7.2, 0.95 + Math.abs(Math.sin(u * 3)) * 1.6, Math.sin(u * 1.7) * 2.6); ball.rotation.set(u * 3, u * 2, 0);
+    flag.rotation.y = Math.sin(time * 3) * 0.25; lamps.forEach((l) => { l.material.emissiveIntensity = 0.8 + 0.2 * Math.sin(time * 9); });
+  };
+  return g;
+}
+
+function pyramid() { // a pyramid in Kozhikode: sand, a big stepped pyramid with a gold cap, a small one beside it and a camel doing rounds
+  const g = new THREE.Group();
+  const sand = new THREE.Mesh(new THREE.CylinderGeometry(11, 11.6, 0.6, 32), mat('#EBCB8B')); sand.position.y = 0.3; g.add(sand);
+  const stone = [mat('#D9A85B'), mat('#CC9A4E')];
+  const tier = (cx, cz, half, n, h) => { for (let k = 0; k < n; k++) { const w = 2 * half * (1 - k / n); const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), stone[k % 2]); b.position.set(cx, 0.6 + h * (k + 0.5), cz); b.rotation.y = 0.5; g.add(b); } return 0.6 + n * h; };
+  const top = tier(-1.2, -1, 6, 12, 0.85);
+  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.75, 1.1, 4), C.gold); cap.position.set(-1.2, top - 0.3, -1); cap.rotation.y = 0.5 + Math.PI / 4; g.add(cap);
+  tier(6.2, 3.6, 2.4, 6, 0.65);
+  const door = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.5, 0.3), mat('#3A2A1A')); door.position.set(1.7, 1.35, 4.3); door.rotation.y = 0.5; g.add(door);
+  const palm = coconut(); palm.scale.setScalar(0.45); palm.position.set(-7.5, 0.6, 4.5); g.add(palm);
+  const camel = new THREE.Group(), fur = mat('#B9823F');
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.9, 0.8), fur); body.position.y = 1.5; camel.add(body);
+  const hump = new THREE.Mesh(new THREE.SphereGeometry(0.5, 7, 5), fur); hump.position.set(-0.1, 2.05, 0); camel.add(hump);
+  const neck = new THREE.Mesh(new THREE.BoxGeometry(0.35, 1.3, 0.4), fur); neck.position.set(1.05, 2.1, 0); neck.rotation.z = -0.35; camel.add(neck);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.4, 0.45), fur); head.position.set(1.5, 2.75, 0); camel.add(head);
+  const legs = [];
+  for (const [x, z] of [[-0.7, 0.28], [-0.7, -0.28], [0.7, 0.28], [0.7, -0.28]]) { const p = new THREE.Group(); p.position.set(x, 1.1, z); const l = new THREE.Mesh(new THREE.BoxGeometry(0.22, 1.1, 0.22), fur); l.position.y = -0.55; p.add(l); camel.add(p); legs.push(p); }
+  g.add(camel);
+  g.userData.radius = 11;
+  g.userData.update = (time) => {
+    const a = time * 0.25; camel.position.set(Math.cos(a) * 9.2, 0.6, Math.sin(a) * 9.2); camel.rotation.y = -a - Math.PI / 2;
+    legs.forEach((l, i) => { l.rotation.z = Math.sin(time * 5 + (i % 3 ? Math.PI : 0)) * 0.45; });
+    cap.material.emissiveIntensity = 0.25 + 0.3 * Math.abs(Math.sin(time * 1.5));
+  };
+  return g;
+}
+
+function eiffel() { // the Paris tower in Kollam: four splayed iron legs, arches, three decks, a spire and twinkling lights
+  const g = new THREE.Group();
+  const iron = mat('#8A6A4B', { roughness: 0.6, metalness: 0.3 }), dark = mat('#5E4630', { roughness: 0.6, metalness: 0.3 });
+  const lawn = new THREE.Mesh(new THREE.CylinderGeometry(8.5, 8.9, 0.5, 28), mat('#57BD4F')); lawn.position.y = 0.25; g.add(lawn);
+  const plaza = new THREE.Mesh(new THREE.BoxGeometry(11, 0.2, 11), mat('#D8D2C0')); plaza.position.y = 0.55; g.add(plaza);
+  const beam = (a, b, t, m = iron) => { // a box from point a to point b
+    const d = new THREE.Vector3().subVectors(b, a), L = d.length();
+    const x = new THREE.Mesh(new THREE.BoxGeometry(t, L, t), m); x.position.copy(a).addScaledVector(d, 0.5);
+    x.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(x); return x;
+  };
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const LV = [[4.6, 0.6], [2.5, 6.2], [1.25, 11.6], [0.28, 23]]; // half-width of the tower at each height
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+    beam(V(sx * LV[0][0], LV[0][1], sz * LV[0][0]), V(sx * LV[1][0], LV[1][1], sz * LV[1][0]), 1.15);
+    beam(V(sx * LV[1][0], LV[1][1], sz * LV[1][0]), V(sx * LV[2][0], LV[2][1], sz * LV[2][0]), 0.8);
+    beam(V(sx * LV[2][0], LV[2][1], sz * LV[2][0]), V(sx * LV[3][0], LV[3][1], sz * LV[3][0]), 0.5);
+    const foot = new THREE.Mesh(new THREE.BoxGeometry(2, 0.7, 2), mat('#B8B2A0')); foot.position.set(sx * 4.6, 0.75, sz * 4.6); g.add(foot);
+  }
+  for (let k = 0; k < 9; k++) { // cross-bracing rings up the top section
+    const u = (k + 1) / 10, hw = LV[2][0] + (LV[3][0] - LV[2][0]) * u, y = LV[2][1] + (LV[3][1] - LV[2][1]) * u;
+    const r = new THREE.Mesh(new THREE.BoxGeometry(hw * 2 + 0.3, 0.14, hw * 2 + 0.3), dark); r.position.y = y; g.add(r);
+  }
+  for (const [hw, y, t] of [[3.0, 6.2, 0.6], [1.7, 11.6, 0.5], [0.6, 21.6, 0.5]]) { // the three decks
+    const d = new THREE.Mesh(new THREE.BoxGeometry(hw * 2, t, hw * 2), dark); d.position.y = y; g.add(d);
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(hw * 2 + 0.3, 0.16, hw * 2 + 0.3), iron); rail.position.y = y + t; g.add(rail);
+  }
+  for (let i = 0; i < 4; i++) { // arches between the legs
+    const arch = new THREE.Mesh(new THREE.TorusGeometry(2.7, 0.22, 4, 14, Math.PI), dark);
+    arch.position.set(Math.sin(i * Math.PI / 2) * 3.5, 2.9, Math.cos(i * Math.PI / 2) * 3.5); arch.rotation.y = i * Math.PI / 2; arch.scale.y = 1.05; g.add(arch);
+  }
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { // X-bracing on the middle section
+    beam(V(sx * 2.5, 6.6, sz * 2.5), V(sx * 1.25, 11.4, -sz * 1.25), 0.16, dark);
+  }
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.2, 3.4, 5), iron); spire.position.y = 24.4; g.add(spire);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.26, 8, 6), mat('#FFE680', { emissive: '#FFD23F', emissiveIntensity: 1 })); beacon.position.y = 26.2; g.add(beacon);
+  const lights = [];
+  for (let i = 0; i < 22; i++) {
+    const u = (i * 0.618) % 1, y = 1.5 + u * 20, hw = y < 6.2 ? 4.6 - (y - 0.6) * 0.375 : y < 11.6 ? 2.5 - (y - 6.2) * 0.231 : 1.25 - (y - 11.6) * 0.085, a = i * 2.4;
+    const s = new THREE.Mesh(new THREE.SphereGeometry(0.16, 5, 4), mat('#FFF6C8', { emissive: '#FFE680', emissiveIntensity: 1 }));
+    const sx = Math.cos(a) > 0 ? 1 : -1, sz = Math.sin(a) > 0 ? 1 : -1; s.position.set(sx * (hw + 0.35), y, sz * (hw + 0.35)); g.add(s); lights.push(s);
+  }
+  for (const [x, z] of [[-6.6, 2], [6.4, -2.6], [5.6, 5]]) { const p = coconut(); p.scale.setScalar(0.4); p.position.set(x, 0.5, z); p.rotation.y = x; g.add(p); } // Kollam, not Paris
+  g.userData.radius = 9;
+  g.userData.update = (time) => { lights.forEach((s, i) => { s.material.emissiveIntensity = Math.sin(time * 6 + i * 1.9) > 0.2 ? 1.2 : 0.1; }); beacon.material.emissiveIntensity = 0.5 + 0.5 * Math.sin(time * 3); };
+  return g;
+}
+
+function taj() { // Taj Mahal in Kannur: marble plinth, onion dome, four chhatris, four minarets and a long pool with fountains
+  const g = new THREE.Group();
+  const marble = mat('#FBF7EE', { roughness: 0.5 }), shade = mat('#E6DFD0', { roughness: 0.5 }), arch = mat('#6F6A7A');
+  const lawn = new THREE.Mesh(new THREE.CylinderGeometry(12, 12.5, 0.5, 36), mat('#57BD4F')); lawn.scale.z = 0.8; lawn.position.y = 0.25; g.add(lawn);
+  const plinth = new THREE.Mesh(new THREE.BoxGeometry(11.5, 1.1, 9), shade); plinth.position.set(0, 1.05, -2.6); g.add(plinth);
+  const Z = -2.6, Y = 1.6;
+  const hall = new THREE.Mesh(new THREE.CylinderGeometry(3.7, 3.7, 4.6, 8), marble); hall.rotation.y = Math.PI / 8; hall.position.set(0, Y + 2.3, Z); g.add(hall);
+  for (let i = 0; i < 4; i++) { // the big arched doorway (iwan) on each face
+    const a = i * Math.PI / 2, f = new THREE.Group(); f.position.set(Math.sin(a) * 3.42, Y, Z + Math.cos(a) * 3.42); f.rotation.y = a;
+    const fr = new THREE.Mesh(new THREE.BoxGeometry(2.7, 5.2, 0.3), marble); fr.position.y = 2.6; f.add(fr);
+    const dr = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.6, 0.12), arch); dr.position.set(0, 1.3, 0.14); f.add(dr);
+    const tp = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.12, 12, 1, false, 0, Math.PI), arch); tp.rotation.set(Math.PI / 2, 0, 0); tp.rotation.z = Math.PI / 2; tp.position.set(0, 2.6, 0.14); f.add(tp);
+    g.add(f);
+  }
+  const drum = new THREE.Mesh(new THREE.CylinderGeometry(1.9, 2.0, 1.3, 16), marble); drum.position.set(0, Y + 5.2, Z); g.add(drum);
+  const onion = (x, y, z, r) => {
+    const d = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), marble); d.scale.y = 1.12; d.position.set(x, y + r * 0.85, z); g.add(d);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(r * 0.5, r * 0.9, 12), marble); tip.position.set(x, y + r * 2.05, z); g.add(tip);
+    const fin = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.07, r * 0.9, 5), C.gold); fin.position.set(x, y + r * 2.8, z); g.add(fin);
+  };
+  onion(0, Y + 5.6, Z, 2.3);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { // chhatris round the dome
+    const x = sx * 2.5, z = Z + sz * 2.5;
+    for (let k = 0; k < 4; k++) { const c = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.9, 4), marble); c.position.set(x + Math.cos(k * Math.PI / 2 + 0.78) * 0.5, Y + 5.05, z + Math.sin(k * Math.PI / 2 + 0.78) * 0.5); g.add(c); }
+    onion(x, Y + 5.35, z, 0.72);
+  }
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { // minarets at the plinth corners
+    const x = sx * 5.1, z = Z + sz * 3.9;
+    const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.5, 8.2, 10), marble); sh.position.set(x, Y + 4.1, z); g.add(sh);
+    for (const by of [2.8, 5.5, 8.2]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.2, 10), shade); b.position.set(x, Y + by, z); g.add(b); }
+    onion(x, Y + 8.3, z, 0.5);
+  }
+  const pool = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.16, 7.4), mat('#3FB6E8', { roughness: 0.25 })); pool.position.set(0, 0.56, 5.6); g.add(pool);
+  const rim = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.1, 8), shade); rim.position.set(0, 0.52, 5.6); g.add(rim);
+  const jets = [];
+  for (let i = 0; i < 5; i++) { const j = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.1, 1, 5), mat('#FFFFFF', { transparent: true, opacity: 0.85 })); j.position.set(0, 1, 2.8 + i * 1.4); g.add(j); jets.push(j); }
+  for (const sx of [-1, 1]) for (let i = 0; i < 4; i++) { const t = new THREE.Mesh(new THREE.ConeGeometry(0.45, 2.4, 6), mat('#2F7A3C')); t.position.set(sx * 2.4, 1.7, 2.8 + i * 1.9); g.add(t); }
+  g.userData.radius = 11;
+  g.userData.update = (time) => { jets.forEach((j, i) => { const h = 0.5 + 0.9 * Math.abs(Math.sin(time * 2 + i * 0.7)); j.scale.y = h; j.position.y = 0.6 + h / 2; }); };
+  return g;
+}
+
+function mountain() { // a mountain for Alappuzha, the flattest district: snow cap, two side peaks, drifting clouds, a flag on top and a kettuvallam left at the foot
+  const g = new THREE.Group();
+  const rock = mat('#6E7B62'), rock2 = mat('#5B6953'), snow = mat('#FFFFFF');
+  const water = new THREE.Mesh(new THREE.CylinderGeometry(11.5, 12, 0.5, 32), mat('#3FB6E8', { roughness: 0.3 })); water.position.y = 0.25; g.add(water);
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(9, 9.8, 0.7, 9), mat('#57BD4F')); foot.position.y = 0.6; g.add(foot);
+  const peak = (x, z, r, h, m, ry) => {
+    const c = new THREE.Mesh(new THREE.ConeGeometry(r, h, 7), m); c.position.set(x, 0.9 + h / 2, z); c.rotation.y = ry; g.add(c);
+    const k = 0.3, s = new THREE.Mesh(new THREE.ConeGeometry(r * k * 1.06, h * k, 7), snow); s.position.set(x, 0.9 + h * (1 - k / 2) + 0.03, z); s.rotation.y = ry; g.add(s);
+    return 0.9 + h;
+  };
+  const top = peak(0, -0.5, 6.6, 15, rock, 0.3);
+  peak(-4.6, 2, 3.8, 8, rock2, 1.1); peak(4.8, 1.2, 3.3, 6.5, rock2, 2.0);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2, 4), C.white); pole.position.set(0, top + 0.8, -0.5); g.add(pole);
+  const flag = new THREE.Group(); flag.position.set(0, top + 1.5, -0.5);
+  const cloth = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.7, 0.05), C.red); cloth.position.x = 0.65; flag.add(cloth); g.add(flag);
+  const clouds = [];
+  for (let i = 0; i < 3; i++) {
+    const c = new THREE.Group();
+    for (const [x, r] of [[-0.9, 0.8], [0, 1.1], [1, 0.75]]) { const p = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 0), mat('#FFFFFF', { transparent: true, opacity: 0.92 })); p.position.x = x; c.add(p); }
+    c.userData = { a: i * 2.1, y: 8.5 + i * 2, r: 6.2 - i * 1.1 }; g.add(c); clouds.push(c);
+  }
+  const boat = houseboat(); boat.scale.setScalar(0.4); boat.position.set(3, 0.5, 9.3); boat.rotation.y = 0.2; g.add(boat);
+  for (const [x, z] of [[-7, 4.5], [7.4, -2.5]]) { const p = coconut(); p.scale.setScalar(0.4); p.position.set(x, 0.9, z); p.rotation.y = z; g.add(p); }
+  g.userData.radius = 12;
+  g.userData.update = (time) => {
+    clouds.forEach((c) => { const a = c.userData.a + time * 0.18; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r - 0.5); });
+    flag.rotation.y = Math.sin(time * 3.5) * 0.35; boat.position.y = 0.45 + Math.sin(time * 1.5) * 0.07;
+  };
+  return g;
+}
+
+export const MODELS = { mountain, taj, eiffel, pyramid, stadium, burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
 export function makeModel(name) { return (MODELS[name] || pin)(); }
