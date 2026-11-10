@@ -370,7 +370,7 @@ function mountain() { // a mountain for Alappuzha, the flattest district: snow c
   return g;
 }
 
-function sheru() { // Sheru Bhai for Malappuram: a white lion boss in a white suit (gold chain, gold watch, phone in hand) with his cub, on a gold-trimmed plinth with a red carpet
+function sheru() { // Sheru Bhai for Malappuram: a white lion boss in a white suit (gold chain, gold watch, phone in hand) with his cub, on a gold-trimmed plinth with a red carpet, under a rain of banknotes
   const g = new THREE.Group();
   const sm = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.75, ...o });
   const suit = sm('#FFFFFF', { emissive: '#FFFFFF', emissiveIntensity: 0.3 }), shirt = sm('#EFE9DC', { emissive: '#EFE9DC', emissiveIntensity: 0.15 });
@@ -454,8 +454,23 @@ function sheru() { // Sheru Bhai for Malappuram: a white lion boss in a white su
   const boss = lion(false); boss.position.set(-0.7, 2.25, 0); boss.scale.setScalar(1.3); g.add(boss);
   const cub = lion(true); cub.position.set(2.7, 2.25, 1.3); cub.scale.setScalar(0.58); cub.rotation.y = -0.7; g.add(cub);
   cub.userData.head.scale.setScalar(1.35);
+  // money rain: notes flutter down around him, and the ones that landed are piled up with gold coins
+  const noteM = [sm('#3FA548', { side: THREE.DoubleSide, emissive: '#3FA548', emissiveIntensity: 0.25 }), sm('#8FD694', { side: THREE.DoubleSide, emissive: '#8FD694', emissiveIntensity: 0.25 })];
+  const noteG = new THREE.BoxGeometry(0.95, 0.03, 0.5), bandG = new THREE.BoxGeometry(0.3, 0.04, 0.52);
+  const note = () => { const n = new THREE.Group(); n.add(new THREE.Mesh(noteG, noteM[0])); n.add(new THREE.Mesh(bandG, noteM[1])); return n; };
+  const rain = [];
+  for (let i = 0; i < 46; i++) {
+    const n = note(), a = i * 2.39996, r = 1.6 + ((i * 0.618) % 1) * 5.6;
+    n.userData = { x: Math.cos(a) * r - 0.4, z: Math.sin(a) * r + 0.4, off: (i * 0.377) % 1, sp: 0.16 + ((i * 0.271) % 1) * 0.1, ph: i * 1.7 };
+    n.scale.setScalar(1.7); g.add(n); rain.push(n);
+  }
+  for (const [x, z, k] of [[-5.2, 2.6, 6], [4.9, -1.6, 5], [5.4, 3.6, 4], [-4.6, -3.2, 5]]) {
+    for (let j = 0; j < k; j++) { const n = note(); n.scale.setScalar(1.5); n.position.set(x + Math.sin(j * 2.3) * 0.25, 0.56 + j * 0.07, z + Math.cos(j * 1.9) * 0.2); n.rotation.y = j * 0.7; g.add(n); }
+  }
+  for (const [x, z, k] of [[-3.9, 4.4, 7], [-3.2, 4.9, 4], [3.6, 5.2, 6], [6.0, 0.8, 5]]) for (let j = 0; j < k; j++) add(g, new THREE.CylinderGeometry(0.42, 0.42, 0.14, 12), gold, x, 0.6 + j * 0.15, z);
   g.userData.radius = 8.5;
   g.userData.update = (time) => {
+    for (const n of rain) { const u = n.userData, f = (time * u.sp + u.off) % 1; n.position.set(u.x + Math.sin(time * 1.6 + u.ph) * 0.7, 17 - f * 16.4, u.z + Math.cos(time * 1.3 + u.ph) * 0.5); n.rotation.set(Math.sin(time * 2.4 + u.ph) * 1.1, time * 1.2 + u.ph, Math.cos(time * 2 + u.ph) * 0.9); }
     boss.userData.head.rotation.y = Math.sin(time * 0.7) * 0.35; boss.userData.tail.rotation.y = Math.sin(time * 2.2) * 0.5;
     cub.userData.head.rotation.x = -0.25 + Math.sin(time * 1.3) * 0.08; cub.userData.tail.rotation.y = Math.sin(time * 5) * 0.7; cub.position.y = 2.25 + Math.abs(Math.sin(time * 3)) * 0.25;
     cub.userData.arms[0].rotation.x = -0.6 + Math.sin(time * 6) * 0.3;
