@@ -478,48 +478,66 @@ function sheru() { // Sheru Bhai for Malappuram: a white lion boss in a white su
   return g;
 }
 
-function bitexco() { // Bitexco Financial Tower (Ho Chi Minh City): a lotus-bud glass tower that swells, then tapers to a slanted tip, with a round helipad hanging off its side
+function bitexco() { // Nithin Tower, modelled on the Bitexco Financial Tower: a lotus-bud glass tower with floor lines, lit lower floors, a side helipad, an annex with its own pad, and a ring road with palms
   const g = new THREE.Group();
-  const sm = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.22, metalness: 0.45, ...o });
-  const gA = sm('#A9CDEB', { emissive: '#A9CDEB', emissiveIntensity: 0.22 }), gB = sm('#7FA8CF', { emissive: '#7FA8CF', emissiveIntensity: 0.22 }), steel = mat('#D5DCE6');
-  const plaza = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 6.9, 0.5, 28), mat('#D8D2C0')); plaza.position.y = 0.25; g.add(plaza);
-  const podium = new THREE.Mesh(new THREE.BoxGeometry(7.5, 1.6, 5.6), mat('#B9C2CF')); podium.position.set(0.4, 1.3, 0); g.add(podium);
-  const N = 44, th = 0.6, y0 = 2.1, H = N * th;
-  const R = (u) => (2.15 + 0.75 * Math.sin(Math.min(1, u / 0.42) * Math.PI / 2)) * (u < 0.42 ? 1 : 1 - 0.86 * ((u - 0.42) / 0.58) ** 1.7); // swell, then taper
-  const X = (u) => -0.9 * u * u;                                                                                   // the taper leans to one side
+  const sm = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.22, metalness: 0.4, ...o });
+  const gA = sm('#5FB0D0', { emissive: '#5FB0D0', emissiveIntensity: 0.25 }), gB = sm('#3F8FB5', { emissive: '#3F8FB5', emissiveIntensity: 0.25 });
+  const lit = sm('#FFD873', { emissive: '#FFC53D', emissiveIntensity: 0.9 }), steel = mat('#C9D2DE'), line = mat('#DCE6F0'), road = mat('#5A6070'), white = mat('#FFFFFF');
+  const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); g.add(o); return o; };
+  // ground: lawn, ring road with dashes, paved plaza
+  add(new THREE.CylinderGeometry(9, 9.4, 0.4, 36), mat('#57BD4F'), 0, 0.2, 0);
+  add(new THREE.CylinderGeometry(8.4, 8.4, 0.12, 40), road, 0, 0.44, 0);
+  add(new THREE.CylinderGeometry(6.6, 6.6, 0.16, 40), mat('#B9BEC8'), 0, 0.46, 0);
+  for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2; const d = add(new THREE.BoxGeometry(0.75, 0.04, 0.14), white, Math.cos(a) * 7.5, 0.52, Math.sin(a) * 7.5); d.rotation.y = -a + Math.PI / 2; }
+  // the tower
+  const N = 46, th = 0.58, y0 = 0.55, H = N * th;
+  const R = (u) => (2.2 + 0.8 * Math.sin(Math.min(1, u / 0.4) * Math.PI / 2)) * (u < 0.4 ? 1 : 1 - 0.88 * ((u - 0.4) / 0.6) ** 1.6);
+  const X = (u) => -1.0 * u * u;
   for (let k = 0; k < N; k++) {
-    const u0 = k / N, u1 = (k + 1) / N;
-    const f = new THREE.Mesh(new THREE.CylinderGeometry(R(u1), R(u0), th, 28), k % 4 === 3 ? gB : gA);
-    f.scale.z = 0.72; f.position.set((X(u0) + X(u1)) / 2, y0 + th * (k + 0.5), 0); g.add(f);
+    const u0 = k / N, u1 = (k + 1) / N, m = k < 5 ? lit : (k % 6 === 5 ? gB : gA);
+    const f = add(new THREE.CylinderGeometry(R(u1), R(u0), th, 30), m, (X(u0) + X(u1)) / 2, y0 + th * (k + 0.5), 0); f.scale.z = 0.74;
+    const l = add(new THREE.CylinderGeometry(R(u1) + 0.03, R(u1) + 0.03, 0.05, 30), k < 5 ? steel : line, X(u1), y0 + th * (k + 1), 0); l.scale.z = 0.74; // floor line
   }
-  const tip = new THREE.Mesh(new THREE.ConeGeometry(R(1), 1.6, 20), gB); tip.scale.z = 0.72; tip.position.set(X(1) - 0.12, y0 + H + 0.75, 0); tip.rotation.z = 0.12; g.add(tip);
-  for (const s of [-1, 1]) { // the bright fin running up each narrow edge
-    const pts = []; for (let k = 0; k <= 22; k++) { const u = k / 22; pts.push(new THREE.Vector3(X(u), y0 + u * H, s * R(u) * 0.72)); }
-    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, 0.09, 5), steel));
-  }
-  const uh = 0.7, hy = y0 + uh * H, hx = X(uh) + R(uh) + 1.5;                                                      // helipad
-  const pad = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 1.9, 0.28, 28), steel); pad.position.set(hx, hy, 0); g.add(pad);
-  const deck = new THREE.Mesh(new THREE.CylinderGeometry(1.85, 1.85, 0.06, 28), mat('#6F7C8C')); deck.position.set(hx, hy + 0.16, 0); g.add(deck);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.07, 4, 28), C.white); ring.rotation.x = Math.PI / 2; ring.position.set(hx, hy + 0.2, 0); g.add(ring);
-  for (const [w, d, z] of [[0.9, 0.14, 0], [0.14, 1.0, 0.38], [0.14, 1.0, -0.38]]) { const h = new THREE.Mesh(new THREE.BoxGeometry(d, 0.05, w), C.white); h.position.set(hx, hy + 0.2, z); g.add(h); }
-  const arm = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.5, 1.5), steel); arm.position.set(hx - 1.7, hy - 0.2, 0); g.add(arm);
+  const tip = add(new THREE.ConeGeometry(R(1), 1.5, 20), gB, X(1) - 0.1, y0 + H + 0.7, 0); tip.scale.z = 0.74; tip.rotation.z = 0.14;
+  const seam = (fx, fz, u1, r) => { // a bright seam following the curve of the glass
+    const pts = []; for (let k = 0; k <= 24; k++) { const u = k / 24 * u1; pts.push(new THREE.Vector3(X(u) + fx * R(u), y0 + u * H, fz * R(u) * 0.74)); }
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, r, 5), steel));
+  };
+  seam(0, 1, 1, 0.09); seam(0, -1, 1, 0.09); seam(0.82, 0.57, 1, 0.07); seam(0.82, -0.57, 1, 0.07);
+  // helipad on the side
+  const uh = 0.68, hy = y0 + uh * H, hx = X(uh) + R(uh) + 1.55;
+  const pad = (x, y, r) => {
+    add(new THREE.CylinderGeometry(r, r * 0.55, 0.5, 28), steel, x, y - 0.15, 0); add(new THREE.CylinderGeometry(r * 0.9, r * 0.9, 0.06, 28), mat('#8C97A6'), x, y + 0.12, 0);
+    const ring = add(new THREE.TorusGeometry(r * 0.6, 0.06, 4, 28), white, x, y + 0.16, 0); ring.rotation.x = Math.PI / 2;
+    for (const [w, d, z] of [[0.8, 0.13, 0], [0.13, 0.9, 0.34], [0.13, 0.9, -0.34]]) add(new THREE.BoxGeometry(d * r / 2, 0.05, w * r / 2), white, x, y + 0.17, z * r / 2);
+  };
+  pad(hx, hy, 2.1); add(new THREE.BoxGeometry(2.4, 0.5, 1.6), steel, hx - 1.7, hy - 0.25, 0);
   const lamps = [];
-  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; const l = new THREE.Mesh(new THREE.SphereGeometry(0.11, 6, 5), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); l.position.set(hx + Math.cos(a) * 1.95, hy + 0.22, Math.sin(a) * 1.95); g.add(l); lamps.push(l); }
-  const heli = new THREE.Group(); // a small helicopter that lifts off and lands
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; lamps.push(add(new THREE.SphereGeometry(0.11, 6, 5), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 }), hx + Math.cos(a) * 1.95, hy + 0.16, Math.sin(a) * 1.95)); }
+  // low annex with glass walls and its own pad
+  const ax = 3.6, az = 2.2;
+  for (let k = 0; k < 4; k++) add(new THREE.CylinderGeometry(1.75, 1.75, 0.62, 20), k < 2 ? lit : gB, ax, 0.86 + k * 0.66, az);
+  for (let k = 0; k <= 4; k++) add(new THREE.CylinderGeometry(1.8, 1.8, 0.06, 20), steel, ax, 0.54 + k * 0.66, az);
+  { const r = 1.5, y = 3.3; add(new THREE.CylinderGeometry(r, r, 0.08, 24), mat('#8C97A6'), ax, y, az); const ring = add(new THREE.TorusGeometry(r * 0.62, 0.05, 4, 24), white, ax, y + 0.05, az); ring.rotation.x = Math.PI / 2;
+    for (const [w, d, z] of [[0.6, 0.1, 0], [0.1, 0.7, 0.26], [0.1, 0.7, -0.26]]) add(new THREE.BoxGeometry(d, 0.05, w), white, ax, y + 0.06, az + z); }
+  // palms, bushes and small trees round the plaza
+  for (const [x, z] of [[-4.6, 2.6], [-3.2, 4.4], [5.4, -0.6], [4.6, -2.8]]) { const p = coconut(); p.scale.setScalar(0.34); p.position.set(x, 0.5, z); p.rotation.y = x * 2; g.add(p); }
+  const bush = mat('#3FA548'), bush2 = mat('#2F8A3C');
+  for (let i = 0; i < 14; i++) { const a = i * 0.47 + 0.4, r = 4.6 + (i % 3) * 0.55; const b = add(new THREE.IcosahedronGeometry(0.32 + (i % 2) * 0.12, 0), i % 2 ? bush : bush2, Math.cos(a) * r, 0.75, Math.sin(a) * r); if (i % 4 === 0) { b.geometry = new THREE.ConeGeometry(0.4, 1.1, 6); b.position.y = 1.05; } }
+  const heli = new THREE.Group();
   const hb = new THREE.Mesh(new THREE.SphereGeometry(0.5, 10, 8), C.red); hb.scale.set(1.5, 0.9, 0.9); heli.add(hb);
   const ht = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.14, 0.14), C.red); ht.position.set(-1.2, 0.1, 0); heli.add(ht);
   const rotor = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.04, 0.16), mat('#1A1A1A')); rotor.position.y = 0.55; heli.add(rotor);
   g.add(heli);
-  for (const [x, z] of [[-5, 2.2], [4.6, 3.4], [-3.8, -3.6]]) { const p = coconut(); p.scale.setScalar(0.36); p.position.set(x, 0.5, z); p.rotation.y = x; g.add(p); }
-  g.userData.radius = 7.5;
+  g.userData.radius = 9;
   g.userData.update = (time) => {
     const c = (time * 0.12) % 1, up = c < 0.15 ? 0 : c < 0.5 ? (c - 0.15) / 0.35 : c < 0.65 ? 1 : 1 - (c - 0.65) / 0.35, e = up * up * (3 - 2 * up);
-    heli.position.set(hx + e * 2.5, hy + 0.6 + e * 5, e * 3); heli.rotation.y = e * 2.4; rotor.rotation.y = time * 25;
+    heli.position.set(hx + e * 2.5, hy + 0.62 + e * 5, e * 3); heli.rotation.y = e * 2.4; rotor.rotation.y = time * 25;
     lamps.forEach((l, i) => { l.material.emissiveIntensity = Math.sin(time * 5 + i) > 0 ? 1 : 0.15; });
+    lit.emissiveIntensity = 0.8 + 0.15 * Math.sin(time * 2);
   };
   return g;
 }
-
 
 export const MODELS = { sheru, bitexco, mountain, taj, eiffel, pyramid, stadium, burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
 export function makeModel(name) { return (MODELS[name] || pin)(); }
