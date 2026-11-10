@@ -92,6 +92,26 @@
    "lon": 76.56,
    "lat": 9.4,
    "by": "venom.4ce"
+  },
+  {
+   "id": 10,
+   "day": 5,
+   "model": "twisttower",
+   "name": "മലപ്പുറം ടവർ",
+   "place": "മലപ്പുറം",
+   "lon": 76.3,
+   "lat": 10.93,
+   "by": "nithin_c_john"
+  },
+  {
+   "id": 11,
+   "day": 5,
+   "model": "sheru",
+   "name": "ഷേരു ഭായ്",
+   "place": "മലപ്പുറം",
+   "lon": 75.98,
+   "lat": 10.92,
+   "by": "_.alfixclusive._"
   }
  ]
 }

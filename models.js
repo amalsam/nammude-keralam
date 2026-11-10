@@ -299,7 +299,7 @@ function eiffel() { // the Paris tower in Kollam: four splayed iron legs, arches
 
 function taj() { // Taj Mahal in Kannur: marble plinth, onion dome, four chhatris, four minarets and a long pool with fountains
   const g = new THREE.Group();
-  const marble = mat('#FBF7EE', { roughness: 0.5 }), shade = mat('#E6DFD0', { roughness: 0.5 }), arch = mat('#6F6A7A');
+  const marble = mat('#FFFFFF', { roughness: 0.5, emissive: '#FFFFFF', emissiveIntensity: 0.3 }), shade = mat('#EFE8D8', { roughness: 0.5, emissive: '#EFE8D8', emissiveIntensity: 0.2 }), arch = mat('#6F6A7A');
   const lawn = new THREE.Mesh(new THREE.CylinderGeometry(12, 12.5, 0.5, 36), mat('#57BD4F')); lawn.scale.z = 0.8; lawn.position.y = 0.25; g.add(lawn);
   const plinth = new THREE.Mesh(new THREE.BoxGeometry(11.5, 1.1, 9), shade); plinth.position.set(0, 1.05, -2.6); g.add(plinth);
   const Z = -2.6, Y = 1.6;
@@ -370,5 +370,68 @@ function mountain() { // a mountain for Alappuzha, the flattest district: snow c
   return g;
 }
 
-export const MODELS = { mountain, taj, eiffel, pyramid, stadium, burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
+function sheru() { // Sheru Bhai for Malappuram: a lion boss in a white suit on a gold-trimmed plinth, red carpet, gold chain, sunglasses
+  const g = new THREE.Group();
+  const suit = mat('#FFFFFF', { roughness: 0.6, emissive: '#FFFFFF', emissiveIntensity: 0.32 }), fur = mat('#E8C98A', { emissive: '#E8C98A', emissiveIntensity: 0.2 }), mane = mat('#FFF3D6', { emissive: '#FFF3D6', emissiveIntensity: 0.28 }), dk = mat('#1A1A1A');
+  const lawn = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 7.9, 0.5, 28), mat('#57BD4F')); lawn.position.y = 0.25; g.add(lawn);
+  const carpet = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.08, 6.5), C.red); carpet.position.set(0, 0.55, 4.2); g.add(carpet);
+  const pl = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 1.6, 8), mat('#F3E7D3')); pl.position.y = 1.3; g.add(pl);
+  const trim = new THREE.Mesh(new THREE.CylinderGeometry(3.35, 3.35, 0.25, 8), C.gold); trim.position.y = 2.15; g.add(trim);
+  const m = new THREE.Group(); m.position.y = 2.25; m.scale.setScalar(1.35); g.add(m);
+  for (const s of [-1, 1]) {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.95, 3.2, 1.0), suit); leg.position.set(s * 0.62, 1.6, 0); m.add(leg);
+    const shoe = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.4, 1.6), suit); shoe.position.set(s * 0.62, 0.2, 0.3); m.add(shoe);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3.0, 0.9), suit); arm.position.set(s * 1.75, 4.5, 0.1); arm.rotation.z = s * 0.12; m.add(arm);
+    const paw = new THREE.Mesh(new THREE.SphereGeometry(0.48, 7, 6), fur); paw.position.set(s * 1.95, 2.85, 0.15); m.add(paw);
+    const lapel = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.7, 0.1), mat('#E6DFD0')); lapel.position.set(s * 0.45, 5.0, 0.76); lapel.rotation.z = -s * 0.3; m.add(lapel);
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.42, 6, 5), fur); ear.position.set(s * 1.05, 8.75, 0.1); m.add(ear);
+  }
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(2.9, 3.0, 1.5), suit); torso.position.y = 4.6; m.add(torso);
+  const belt = new THREE.Mesh(new THREE.BoxGeometry(2.95, 0.3, 1.55), mat('#7A4520')); belt.position.y = 3.25; m.add(belt);
+  const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.1), C.gold); buckle.position.set(0, 3.25, 0.8); m.add(buckle);
+  const chain = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.13, 5, 16), C.gold); chain.position.set(0, 5.5, 0.72); chain.rotation.x = 0.35; chain.scale.y = 1.25; m.add(chain);
+  const locket = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.55, 0.12), C.gold); locket.position.set(0, 4.5, 0.85); m.add(locket);
+  const head = new THREE.Group(); head.position.y = 7.6; m.add(head);
+  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; const t = new THREE.Mesh(new THREE.IcosahedronGeometry(1.0, 0), mane); t.position.set(Math.cos(a) * 1.25, Math.sin(a) * 1.25 - 0.15, -0.35); head.add(t); }
+  const back = new THREE.Mesh(new THREE.IcosahedronGeometry(1.75, 1), mane); back.position.set(0, -0.3, -0.7); head.add(back);
+  const beard = new THREE.Mesh(new THREE.ConeGeometry(1.2, 2.2, 6), mane); beard.position.set(0, -1.7, 0.35); beard.rotation.x = Math.PI; head.add(beard);
+  const face = new THREE.Mesh(new THREE.SphereGeometry(1.1, 10, 8), fur); face.position.z = 0.25; head.add(face);
+  const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.62, 8, 6), mat('#FFF8E8')); muzzle.scale.set(1.15, 0.8, 1); muzzle.position.set(0, -0.35, 1.1); head.add(muzzle);
+  const nose = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.26, 0.2), mat('#6B4A3A')); nose.position.set(0, -0.12, 1.68); head.add(nose);
+  for (const s of [-1, 1]) { const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.1, 10), dk); lens.rotation.x = Math.PI / 2; lens.position.set(s * 0.45, 0.28, 1.2); head.add(lens); }
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.09, 0.09), C.gold); bridge.position.set(0, 0.35, 1.18); head.add(bridge);
+  const tail = new THREE.Group(); tail.position.set(0.3, 3.3, -0.7); m.add(tail);
+  const tl = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.13, 2.6, 5), fur); tl.position.set(0, -0.5, -1.0); tl.rotation.x = -1.0; tail.add(tl);
+  const tuft = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 0), mane); tuft.position.set(0, 0.2, -2.15); tail.add(tuft);
+  const posts = [];
+  for (const s of [-1, 1]) for (const z of [2, 4.6, 7.2]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.14, 1.3, 6), C.gold); p.position.set(s * 1.7, 1.15, z); g.add(p); const k = new THREE.Mesh(new THREE.SphereGeometry(0.2, 6, 5), C.gold); k.position.set(s * 1.7, 1.9, z); g.add(k); posts.push(k); }
+  g.userData.radius = 8;
+  g.userData.update = (time) => { head.rotation.y = Math.sin(time * 0.7) * 0.4; head.rotation.z = Math.sin(time * 0.35) * 0.05; tail.rotation.y = Math.sin(time * 2.2) * 0.5; chain.material.emissiveIntensity = 0.2 + 0.4 * Math.abs(Math.sin(time * 2)); };
+  return g;
+}
+
+function twisttower() { // Malappuram Tower (our own design): a glass tower that twists a quarter turn as it climbs, a sky garden half way and a slowly turning halo
+  const g = new THREE.Group();
+  const gA = mat('#7FD6C2', { roughness: 0.25, metalness: 0.35 }), gB = mat('#4FB8A4', { roughness: 0.25, metalness: 0.35 });
+  const plaza = new THREE.Mesh(new THREE.CylinderGeometry(6, 6.4, 0.5, 6), mat('#D8D2C0')); plaza.position.y = 0.25; g.add(plaza);
+  const N = 26, th = 0.95;
+  for (let k = 0; k < N; k++) {
+    if (k === 13) continue; // sky garden gap
+    const w = 4.4 - k * 0.075, f = new THREE.Mesh(new THREE.BoxGeometry(w, th * 0.9, w), k % 2 ? gB : gA);
+    f.position.y = 0.5 + th * (k + 0.5); f.rotation.y = (k / N) * Math.PI / 2; g.add(f);
+  }
+  const core = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, N * th, 8), C.white); core.position.y = 0.5 + N * th / 2; g.add(core);
+  const gy = 0.5 + th * 13.5;
+  for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + 0.8; const t = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 0), C.frond); t.position.set(Math.cos(a) * 1.5, gy - 0.1, Math.sin(a) * 1.5); g.add(t); }
+  const top = 0.5 + N * th;
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.25, 3.2, 6), C.white); mast.position.y = top + 1.6; g.add(mast);
+  const halo = new THREE.Mesh(new THREE.TorusGeometry(2.3, 0.14, 5, 28), mat('#FFE680', { emissive: '#FFD23F', emissiveIntensity: 0.9 })); halo.position.y = top + 1.5; g.add(halo);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.24, 8, 6), mat('#FF3B30', { emissive: '#FF3B30', emissiveIntensity: 1 })); tip.position.y = top + 3.3; g.add(tip);
+  for (const [x, z] of [[-4.6, 1.5], [4.2, 2.6]]) { const p = coconut(); p.scale.setScalar(0.38); p.position.set(x, 0.5, z); p.rotation.y = x; g.add(p); }
+  g.userData.radius = 7;
+  g.userData.update = (time) => { halo.rotation.x = Math.PI / 2 + Math.sin(time * 0.9) * 0.35; halo.rotation.y = time * 0.8; tip.material.emissiveIntensity = Math.sin(time * 4) > 0 ? 1 : 0.2; };
+  return g;
+}
+
+export const MODELS = { sheru, twisttower, mountain, taj, eiffel, pyramid, stadium, burj, beach, f1track, coconut, house, houseboat, fishingnet, lighthouse, tower, pin };
 export function makeModel(name) { return (MODELS[name] || pin)(); }
