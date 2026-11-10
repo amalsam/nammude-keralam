@@ -420,11 +420,22 @@ function sheru() { // Sheru Bhai for Malappuram: a white lion boss in a white su
     // head
     const head = new THREE.Group(); head.position.set(0, cub ? 8.1 : 8.35, 0.15); m.add(head);
     if (!cub) {
-      add(head, S(2.0), mane, 0, 0.1, -0.75, 1.05, 1.1, 0.9);                                    // the big mane behind
-      for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 1.42; add(head, S(0.8), mane, Math.cos(a) * r * 1.05, Math.sin(a) * r + 0.05, -0.15 - Math.abs(Math.sin(a)) * 0.15, 1, 1.1, 0.9); }
-      add(head, S(1.0), mane, 0, 1.75, -0.55, 1.2, 0.8, 1.2);                                    // swept-back top
-      add(head, S(1.25), mane, 0, -1.75, 0.2, 1.15, 1.45, 0.8);                                  // chest mane
-      for (const s of [-1, 1]) add(head, S(0.9), mane, s * 1.15, -1.5, -0.1, 1, 1.5, 0.85);
+      add(head, S(1.75), mane, 0, 0.0, -0.8, 1.05, 1.1, 0.85);                                   // volume behind the face
+      const mane2 = sm('#EFE7D6', { emissive: '#EFE7D6', emissiveIntensity: 0.2 }), UP = new THREE.Vector3(0, 1, 0);
+      const lock = (x, y, z, dx, dy, dz, len, w, m2) => { // one tapered strand of mane, pointing along (dx,dy,dz)
+        const o = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), m2 ? mane2 : mane); o.scale.set(w, len, w * 0.8);
+        const d = new THREE.Vector3(dx, dy, dz).normalize(); o.quaternion.setFromUnitVectors(UP, d); o.position.set(x + d.x * len * 0.6, y + d.y * len * 0.6, z + d.z * len * 0.6); head.add(o);
+      };
+      for (let L = 0; L < 3; L++) { // three layers of strands: they fan out from the face, sweep back and fall with gravity
+        const n = 16 + L * 3, r = 0.95 + L * 0.42;
+        for (let k = 0; k < n; k++) {
+          const a = (k + L * 0.5) / n * Math.PI * 2, cx = Math.cos(a), cy = Math.sin(a), down = cy < 0 ? 1 : 0;
+          const upF = Math.max(cy, 0), side = 1 - upF;
+          lock(cx * r * 0.95, cy * r * 0.9 + 0.15, -0.05 - L * 0.38, cx * (0.3 + upF * 0.25), -side * 1.0 + upF * 0.05 - 0.2, -upF * 1.1 - 0.2 - L * 0.1, 1.05 + L * 0.22 + side * 0.45 + (k % 3) * 0.12, 0.5 - L * 0.03, (k + L) % 2);
+        }
+      }
+      for (let k = 0; k < 7; k++) { const x = (k - 3) * 0.3; lock(x, 1.05, 0.3, x * 0.4, 0.08, -1, 1.2, 0.46, k % 2); }                     // swept back over the top
+      for (let k = 0; k < 9; k++) { const x = (k - 4) * 0.32; lock(x, -1.0, 0.75 - Math.abs(x) * 0.25, x * 0.25, -1, 0.1, 1.35 - Math.abs(x) * 0.25 + (k % 2) * 0.2, 0.46, k % 2); } // chest mane
     }
     add(head, S(1.12), fur, 0, 0, 0.3, 1, 1.05, 1);
     for (const s of [-1, 1]) {
