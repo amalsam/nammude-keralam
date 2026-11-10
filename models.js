@@ -370,43 +370,85 @@ function mountain() { // a mountain for Alappuzha, the flattest district: snow c
   return g;
 }
 
-function sheru() { // Sheru Bhai for Malappuram: a lion boss in a white suit on a gold-trimmed plinth, red carpet, gold chain, sunglasses
+function sheru() { // Sheru Bhai for Malappuram: a white lion boss in a white suit (gold chain, gold watch, phone in hand) with his cub, on a gold-trimmed plinth with a red carpet
   const g = new THREE.Group();
-  const suit = mat('#FFFFFF', { roughness: 0.6, emissive: '#FFFFFF', emissiveIntensity: 0.32 }), fur = mat('#E8C98A', { emissive: '#E8C98A', emissiveIntensity: 0.2 }), mane = mat('#FFF3D6', { emissive: '#FFF3D6', emissiveIntensity: 0.28 }), dk = mat('#1A1A1A');
-  const lawn = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 7.9, 0.5, 28), mat('#57BD4F')); lawn.position.y = 0.25; g.add(lawn);
-  const carpet = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.08, 6.5), C.red); carpet.position.set(0, 0.55, 4.2); g.add(carpet);
-  const pl = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.5, 1.6, 8), mat('#F3E7D3')); pl.position.y = 1.3; g.add(pl);
-  const trim = new THREE.Mesh(new THREE.CylinderGeometry(3.35, 3.35, 0.25, 8), C.gold); trim.position.y = 2.15; g.add(trim);
-  const m = new THREE.Group(); m.position.y = 2.25; m.scale.setScalar(1.35); g.add(m);
-  for (const s of [-1, 1]) {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.95, 3.2, 1.0), suit); leg.position.set(s * 0.62, 1.6, 0); m.add(leg);
-    const shoe = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.4, 1.6), suit); shoe.position.set(s * 0.62, 0.2, 0.3); m.add(shoe);
-    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.8, 3.0, 0.9), suit); arm.position.set(s * 1.75, 4.5, 0.1); arm.rotation.z = s * 0.12; m.add(arm);
-    const paw = new THREE.Mesh(new THREE.SphereGeometry(0.48, 7, 6), fur); paw.position.set(s * 1.95, 2.85, 0.15); m.add(paw);
-    const lapel = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.7, 0.1), mat('#E6DFD0')); lapel.position.set(s * 0.45, 5.0, 0.76); lapel.rotation.z = -s * 0.3; m.add(lapel);
-    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.42, 6, 5), fur); ear.position.set(s * 1.05, 8.75, 0.1); m.add(ear);
-  }
-  const torso = new THREE.Mesh(new THREE.BoxGeometry(2.9, 3.0, 1.5), suit); torso.position.y = 4.6; m.add(torso);
-  const belt = new THREE.Mesh(new THREE.BoxGeometry(2.95, 0.3, 1.55), mat('#7A4520')); belt.position.y = 3.25; m.add(belt);
-  const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.1), C.gold); buckle.position.set(0, 3.25, 0.8); m.add(buckle);
-  const chain = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.13, 5, 16), C.gold); chain.position.set(0, 5.5, 0.72); chain.rotation.x = 0.35; chain.scale.y = 1.25; m.add(chain);
-  const locket = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.55, 0.12), C.gold); locket.position.set(0, 4.5, 0.85); m.add(locket);
-  const head = new THREE.Group(); head.position.y = 7.6; m.add(head);
-  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; const t = new THREE.Mesh(new THREE.IcosahedronGeometry(1.0, 0), mane); t.position.set(Math.cos(a) * 1.25, Math.sin(a) * 1.25 - 0.15, -0.35); head.add(t); }
-  const back = new THREE.Mesh(new THREE.IcosahedronGeometry(1.75, 1), mane); back.position.set(0, -0.3, -0.7); head.add(back);
-  const beard = new THREE.Mesh(new THREE.ConeGeometry(1.2, 2.2, 6), mane); beard.position.set(0, -1.7, 0.35); beard.rotation.x = Math.PI; head.add(beard);
-  const face = new THREE.Mesh(new THREE.SphereGeometry(1.1, 10, 8), fur); face.position.z = 0.25; head.add(face);
-  const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.62, 8, 6), mat('#FFF8E8')); muzzle.scale.set(1.15, 0.8, 1); muzzle.position.set(0, -0.35, 1.1); head.add(muzzle);
-  const nose = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.26, 0.2), mat('#6B4A3A')); nose.position.set(0, -0.12, 1.68); head.add(nose);
-  for (const s of [-1, 1]) { const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.1, 10), dk); lens.rotation.x = Math.PI / 2; lens.position.set(s * 0.45, 0.28, 1.2); head.add(lens); }
-  const bridge = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.09, 0.09), C.gold); bridge.position.set(0, 0.35, 1.18); head.add(bridge);
-  const tail = new THREE.Group(); tail.position.set(0.3, 3.3, -0.7); m.add(tail);
-  const tl = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.13, 2.6, 5), fur); tl.position.set(0, -0.5, -1.0); tl.rotation.x = -1.0; tail.add(tl);
-  const tuft = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 0), mane); tuft.position.set(0, 0.2, -2.15); tail.add(tuft);
-  const posts = [];
-  for (const s of [-1, 1]) for (const z of [2, 4.6, 7.2]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.14, 1.3, 6), C.gold); p.position.set(s * 1.7, 1.15, z); g.add(p); const k = new THREE.Mesh(new THREE.SphereGeometry(0.2, 6, 5), C.gold); k.position.set(s * 1.7, 1.9, z); g.add(k); posts.push(k); }
-  g.userData.radius = 8;
-  g.userData.update = (time) => { head.rotation.y = Math.sin(time * 0.7) * 0.4; head.rotation.z = Math.sin(time * 0.35) * 0.05; tail.rotation.y = Math.sin(time * 2.2) * 0.5; chain.material.emissiveIntensity = 0.2 + 0.4 * Math.abs(Math.sin(time * 2)); };
+  const sm = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.75, ...o });
+  const suit = sm('#FFFFFF', { emissive: '#FFFFFF', emissiveIntensity: 0.3 }), shirt = sm('#EFE9DC', { emissive: '#EFE9DC', emissiveIntensity: 0.15 });
+  const fur = sm('#EDE3D0', { emissive: '#EDE3D0', emissiveIntensity: 0.18 }), mane = sm('#FAF5EA', { emissive: '#FAF5EA', emissiveIntensity: 0.25 });
+  const gold = sm('#FFC93C', { emissive: '#FFB000', emissiveIntensity: 0.3, metalness: 0.6, roughness: 0.35 }), dk = sm('#2A1F1A'), pink = sm('#C98F86');
+  const add = (parent, geo, m, x, y, z, sx = 1, sy = 1, sz = 1) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); parent.add(o); return o; };
+  const S = (r) => new THREE.SphereGeometry(r, 16, 12), Cap = (r, l) => new THREE.CapsuleGeometry(r, l, 6, 12);
+  add(g, new THREE.CylinderGeometry(8, 8.4, 0.5, 28), mat('#57BD4F'), 0, 0.25, 0);
+  add(g, new THREE.BoxGeometry(2.8, 0.08, 6.5), C.red, 0, 0.55, 5.4);
+  add(g, new THREE.CylinderGeometry(4.2, 4.5, 1.6, 10), mat('#F3E7D3'), 0, 1.3, 0);
+  add(g, new THREE.CylinderGeometry(4.35, 4.35, 0.25, 10), C.gold, 0, 2.15, 0);
+  add(g, new THREE.CylinderGeometry(4.05, 4.05, 0.1, 10), mat('#FFFFFF'), 0, 2.3, 0);
+  for (const s of [-1, 1]) for (const z of [3.6, 5.6, 7.6]) { add(g, new THREE.CylinderGeometry(0.1, 0.14, 1.3, 6), C.gold, s * 1.8, 1.15, z); add(g, S(0.2), C.gold, s * 1.8, 1.9, z); }
+
+  const lion = (cub) => {
+    const m = new THREE.Group();
+    // legs, shoes / feet
+    for (const s of [-1, 1]) {
+      add(m, Cap(0.58, 2.3), suit, s * 0.72, 1.85, 0);
+      if (cub) add(m, S(0.55), fur, s * 0.72, 0.32, 0.25, 1, 0.6, 1.3);
+      else { add(m, S(0.6), suit, s * 0.72, 0.36, 0.35, 0.95, 0.58, 1.6); add(m, new THREE.BoxGeometry(1.05, 0.12, 1.85), sm('#C9A46A'), s * 0.72, 0.07, 0.35); }
+    }
+    // jacket: broad shoulders tapering to the waist, then the skirt of the coat
+    add(m, new THREE.CylinderGeometry(2.0, 1.5, 3.3, 18), suit, 0, 5.0, 0, 1, 1, 0.62);
+    add(m, new THREE.CylinderGeometry(1.5, 1.62, 1.3, 18), suit, 0, 3.05, 0, 1, 1, 0.64);
+    add(m, S(1.0), suit, 0, 6.5, 0, 1.95, 0.55, 0.66);
+    if (!cub) {
+      add(m, new THREE.BoxGeometry(0.9, 2.2, 0.1), shirt, 0, 5.6, 1.12);                         // shirt in the V of the jacket
+      for (const s of [-1, 1]) { const l = add(m, new THREE.BoxGeometry(0.62, 2.5, 0.12), suit, s * 0.62, 5.5, 1.2); l.rotation.z = -s * 0.28; l.rotation.y = s * 0.25; }
+      for (const y of [4.1, 3.4]) add(m, S(0.13), gold, 0.12, y, 1.06);
+      add(m, new THREE.BoxGeometry(0.55, 0.3, 0.1), shirt, 1.05, 5.75, 1.08);                    // pocket square
+      for (const s of [-1, 1]) add(m, new THREE.BoxGeometry(0.85, 0.22, 0.1), shirt, s * 1.0, 3.5, 0.98);
+      const ch = add(m, new THREE.TorusGeometry(0.95, 0.11, 6, 22), gold, 0, 6.05, 0.95, 1, 1.25, 1); ch.rotation.x = 0.5;
+    } else { add(m, new THREE.BoxGeometry(3.1, 0.3, 0.2), shirt, 0, 3.6, 0.95); add(m, new THREE.BoxGeometry(0.45, 0.36, 0.1), gold, 0, 3.6, 1.06); }
+    // arms and paws
+    const arms = [];
+    for (const s of [-1, 1]) {
+      const a = new THREE.Group(); a.position.set(s * 2.05, 6.35, 0); a.rotation.z = s * 0.13; m.add(a); arms.push(a);
+      add(a, S(0.78), suit, 0, 0, 0); add(a, Cap(0.56, 2.3), suit, 0, -1.6, 0.05);
+      add(a, S(0.66), fur, 0, -3.35, 0.15, 1, 1.05, 1);
+      if (!cub && s === 1) { const w = add(a, new THREE.TorusGeometry(0.56, 0.13, 6, 16), gold, 0, -2.85, 0.08); w.rotation.x = Math.PI / 2; }
+      if (!cub && s === -1) { const ph = add(a, new THREE.BoxGeometry(0.62, 1.15, 0.1), sm('#BFE3FF', { emissive: '#9FD8FF', emissiveIntensity: 0.9 }), 0.05, -3.5, 0.78); ph.rotation.x = -0.5; add(a, new THREE.BoxGeometry(0.7, 1.23, 0.08), dk, 0.05, -3.52, 0.72).rotation.x = -0.5; }
+    }
+    // tail
+    const tail = new THREE.Group(); tail.position.set(0.3, 3.1, -0.9); m.add(tail);
+    const tl = add(tail, Cap(0.13, 2.6), fur, 0, -0.7, -1.1); tl.rotation.x = -1.05; add(tail, S(0.42), mane, 0, 0.0, -2.45, 1, 1, 1.3);
+    // head
+    const head = new THREE.Group(); head.position.set(0, cub ? 8.1 : 8.35, 0.15); m.add(head);
+    if (!cub) {
+      add(head, S(2.0), mane, 0, 0.1, -0.75, 1.05, 1.1, 0.9);                                    // the big mane behind
+      for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 1.42; add(head, S(0.8), mane, Math.cos(a) * r * 1.05, Math.sin(a) * r + 0.05, -0.15 - Math.abs(Math.sin(a)) * 0.15, 1, 1.1, 0.9); }
+      add(head, S(1.0), mane, 0, 1.75, -0.55, 1.2, 0.8, 1.2);                                    // swept-back top
+      add(head, S(1.25), mane, 0, -1.75, 0.2, 1.15, 1.45, 0.8);                                  // chest mane
+      for (const s of [-1, 1]) add(head, S(0.9), mane, s * 1.15, -1.5, -0.1, 1, 1.5, 0.85);
+    }
+    add(head, S(1.12), fur, 0, 0, 0.3, 1, 1.05, 1);
+    for (const s of [-1, 1]) {
+      add(head, S(0.42), fur, s * 0.98, 1.05, 0.15, 1, 1, 0.6); add(head, S(0.24), pink, s * 0.98, 1.05, 0.34, 1, 1, 0.4);
+      add(head, S(0.5), mane, s * 0.36, -0.42, 1.16, 1.05, 0.85, 1);                             // whisker pads
+      add(head, S(0.22), sm('#FFFFFF'), s * 0.47, 0.3, 1.2, 1.15, 0.8, 0.6); add(head, S(0.13), sm('#B8862B'), s * 0.47, 0.3, 1.31, 1, 1, 0.5); add(head, S(0.065), dk, s * 0.47, 0.3, 1.37);
+      const br = add(head, new THREE.BoxGeometry(0.55, 0.1, 0.16), mane, s * 0.47, 0.56, 1.22); br.rotation.z = s * 0.25;
+    }
+    add(head, S(0.4), mane, 0, -0.82, 1.02, 1, 0.75, 0.9);                                       // chin
+    add(head, new THREE.BoxGeometry(0.34, 0.6, 0.5), fur, 0, 0.05, 1.18);                        // bridge of the nose
+    add(head, S(0.24), pink, 0, -0.2, 1.56, 1.25, 0.8, 0.75);
+    add(head, new THREE.BoxGeometry(0.06, 0.3, 0.06), dk, 0, -0.45, 1.6); add(head, new THREE.BoxGeometry(0.62, 0.06, 0.06), dk, 0, -0.62, 1.52);
+    m.userData = { head, tail, arms };
+    return m;
+  };
+  const boss = lion(false); boss.position.set(-0.7, 2.25, 0); boss.scale.setScalar(1.3); g.add(boss);
+  const cub = lion(true); cub.position.set(2.7, 2.25, 1.3); cub.scale.setScalar(0.58); cub.rotation.y = -0.7; g.add(cub);
+  cub.userData.head.scale.setScalar(1.35);
+  g.userData.radius = 8.5;
+  g.userData.update = (time) => {
+    boss.userData.head.rotation.y = Math.sin(time * 0.7) * 0.35; boss.userData.tail.rotation.y = Math.sin(time * 2.2) * 0.5;
+    cub.userData.head.rotation.x = -0.25 + Math.sin(time * 1.3) * 0.08; cub.userData.tail.rotation.y = Math.sin(time * 5) * 0.7; cub.position.y = 2.25 + Math.abs(Math.sin(time * 3)) * 0.25;
+    cub.userData.arms[0].rotation.x = -0.6 + Math.sin(time * 6) * 0.3;
+  };
   return g;
 }
 
