@@ -1,7 +1,7 @@
 {
  "title": "നമ്മുടെ കേരളം",
  "instagram": "kauthukam__",
- "updated": "2026-11-16",
+ "updated": "2026-11-23",
  "items": [
   {
    "id": 1,
@@ -112,6 +112,96 @@
    "lon": 75.98,
    "lat": 10.92,
    "by": "_.alfixclusive._"
+  },
+  {
+   "id": 12,
+   "day": 6,
+   "model": "mall",
+   "name": "മാൾ",
+   "place": "കാസർഗോഡ്",
+   "lon": 75.12,
+   "lat": 12.47,
+   "by": "fadhu_.faraz_.090._"
+  },
+  {
+   "id": 13,
+   "day": 6,
+   "model": "spacestation",
+   "name": "സ്പേസ് സ്റ്റേഷൻ",
+   "place": "കൊല്ലം",
+   "lon": 76.76,
+   "lat": 8.8,
+   "by": "mr_sa_ch_ux"
+  },
+  {
+   "id": 14,
+   "day": 6,
+   "model": "worldcup",
+   "name": "2030 വേൾഡ് കപ്പ്",
+   "place": "മലപ്പുറം",
+   "lon": 76.22,
+   "lat": 11.12,
+   "by": "_.alfixclusive._"
+  },
+  {
+   "id": 15,
+   "day": 6,
+   "model": "jatayu",
+   "name": "ജടായു പാറ",
+   "place": "കൊല്ലം",
+   "lon": 77.02,
+   "lat": 8.82,
+   "by": "mr_afsalappu"
+  },
+  {
+   "id": 16,
+   "day": 6,
+   "model": "medcollege",
+   "name": "ഗവൺമെന്റ് മെഡിക്കൽ കോളേജ്",
+   "place": "കാസർഗോഡ്",
+   "lon": 75.26,
+   "lat": 12.28,
+   "by": "dhanu_._.sshh"
+  },
+  {
+   "id": 17,
+   "day": 6,
+   "model": "parliament",
+   "name": "പാർലമെന്റ്",
+   "place": "മലപ്പുറം",
+   "lon": 76.1,
+   "lat": 10.72,
+   "by": "goat___tm"
+  },
+  {
+   "id": 18,
+   "day": 6,
+   "model": "statues",
+   "name": "സ്വർണ്ണ പ്രതിമകൾ 7 · 10 · 10",
+   "place": "മലപ്പുറം",
+   "lon": 76.42,
+   "lat": 11.08,
+   "by": "kumma.nyt"
+  },
+  {
+   "id": 19,
+   "day": 6,
+   "model": "everest",
+   "name": "മൗണ്ട് എവറസ്റ്റ്",
+   "place": "മലപ്പുറം",
+   "lon": 76.1,
+   "lat": 11.28,
+   "by": "ig.hadyyy"
+  },
+  {
+   "id": 20,
+   "day": 6,
+   "model": "ground",
+   "name": "ഫുട്ബോൾ ഗ്രൗണ്ട് 7 · 10 · 10",
+   "place": "പാലക്കാട്",
+   "lon": 76.64,
+   "lat": 10.8,
+   "by": "a_d_v_a_i_t________"
   }
  ]
 }
