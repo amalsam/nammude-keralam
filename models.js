@@ -639,7 +639,8 @@ function everest() { // Malappuram's Mount Everest: a tall jagged peak with a de
   peak(-6.2, 3, 4.8, 13, rock2, 1.0, 0.35); peak(6, 2, 4.2, 11, rock2, 2.1, 0.35); peak(1.5, -5.5, 4.5, 14, rock2, 0.7, 0.35);
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.4, 4), C.white); pole.position.set(0, top + 1, 0); g.add(pole);
   const flag = new THREE.Group(); flag.position.set(0, top + 1.8, 0);
-  const cloth = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.9, 0.05), mat('#3FA548')); cloth.position.x = 0.8; flag.add(cloth); g.add(flag);
+  [['#FF9933', 0.3], ['#FFFFFF', 0], ['#138808', -0.3]].forEach(([c, y]) => { const b = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.3, 0.05), mat(c)); b.position.set(0.8, y, 0); flag.add(b); }); // the tricolour
+  const chakra = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.025, 4, 16), mat('#000080')); chakra.position.set(0.8, 0, 0.04); flag.add(chakra); g.add(flag);
   const pc = ['#3F7FE0', '#FFFFFF', '#E0453A', '#3FA548', '#F2B233'];
   for (let i = 0; i < 10; i++) { const f = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.35, 0.03), mat(pc[i % 5])); const u = i / 9; f.position.set(lerp1(0.2, 4.5, u), top - 4.5 - u * 3.5 - Math.sin(u * Math.PI) * 0.5, lerp1(0.2, 2.5, u)); g.add(f); }
   for (const [x, z, c] of [[5.6, 6.6, '#F2B233'], [6.6, 5.4, '#E0453A'], [-6, 7, '#3F7FE0']]) { const t = new THREE.Mesh(new THREE.ConeGeometry(0.9, 1.1, 4), mat(c)); t.position.set(x, 1.35, z); t.rotation.y = 0.8; g.add(t); }
